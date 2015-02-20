@@ -25,7 +25,7 @@ $.couch.app(function(app) {
 
 
   var getData = function(){
-    $("#graphstatus").text("Please wait.");
+    $("#graphstatus").text("Loading Data...Please wait.");
     var views=[];
     var iosresults=[];
     var deltavresult;
@@ -38,7 +38,7 @@ $.couch.app(function(app) {
       );
     }
     views.push(
-      $.getJSON(path+onemindb+"/_view/deltav"+options+"000",function(result){
+      $.getJSON(path+onemindb+"/_view/pi_db"+options+"000",function(result){
         deltavresult=result.rows;
       })
     );

@@ -31,9 +31,9 @@ function(doc, req) {
     },
     "crates":{
       "channels":[
-        "8V",
-        "5V",
-        "-5V",
+        //"8V",
+        //"5V",
+        //"-5V",
         "XL3_V",
         "XL3_T"
       ],

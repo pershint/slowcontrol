@@ -7,7 +7,7 @@ $.couch.app(function(app) {
   var channelNames;
   var sizes={};
   var names=[];
-  var deltav="/_view/deltav";
+  var deltav="/_view/pi_db";
 
   var retrieveSizes = function(callback){
     $.getJSON(path+channeldb+options,function(result){
@@ -18,87 +18,58 @@ $.couch.app(function(app) {
     });
   };
 
-  var thresholdString=function(channelid){
-    var outputString = "<div class='wideColumn'>"
-      +   "<div class='wide'>" 
-      +     "<div class='wide set' id='name"
-      +       channelid + "'><\/div>"
-      +     "<div class='wide present'>Present Thresholds<\/div>"
-      +     "<div class='wide approved'>Approved Thresholds<\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<input class='narrow set' id='lolo"
-      +       channelid + "' data-role='none' \/>"
-      +     "<div class='narrow present' id='lolo_present"
-      +       channelid + "'><\/div>"
-      +     "<div class='narrow approved' id='lolo_approved"
-      +       channelid + "'><\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<input class='narrow set' id='lo"
-      +       channelid + "' data-role='none' \/>"
-      +     "<div class='narrow present' id='lo_present"
-      +       channelid + "'><\/div>"
-      +     "<div class='narrow approved' id='lo_approved"
-      +       channelid + "'><\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<div class='narrow set realvalue' id='present"
-      +       channelid + "'><\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<input class='narrow set' id='hi"
-      +       channelid + "' data-role='none' \/>"
-      +     "<div class='narrow present' id='hi_present"
-      +       channelid + "'><\/div>"
-      +     "<div class='narrow approved' id='hi_approved"
-      +       channelid + "'><\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<input class='narrow set' id='hihi"
-      +       channelid + "' data-role='none' \/>"
-      +     "<div class='narrow present' id='hihi_present"
-      +       channelid + "'><\/div>"
-      +     "<div class='narrow approved' id='hihi_approved"
-      +       channelid + "'><\/div>"
-      +   "<\/div>"
-      + "<\/div>"
-      + "<div class='narrowColumn'>"
-      +   "<div class='narrow'>"
-      +     "<input type='checkbox' id='isEnabled"
-      +       channelid + "' data-role='none' \/>"
-      +   "<\/div>"
-      + "<\/div>";
-    return outputString;
-  };
-
+    var thresholdString=function(channelid, condensedType){
+	var outputString = "<table>"
+	    +"<tr>"
+	    +"<td><div class='wide set' id='name"+ channelid +"'><\/div></td>"
+	    +"<td><input type='text' class='narrow set' id='lolo"+ channelid +"' \/></td>"
+	    +"<td><input type='text' class='narrow set' id='lo"+ channelid +"' \/></td>"
+	    +"<td><div class='narrow set realvalue' id='present"+ channelid +"'><\/div></td>"
+	    +"<td><input type='text' class='narrow set' id='hi"+ channelid +"' \/></td>"
+	    +"<td><input type='text' class='narrow set' id='hihi"+ channelid +"' \/></td>"
+	    +"<td><form><input type='checkbox' class='"+condensedType+"' id='isEnabled"+ channelid +"' \/></td>"
+	    +"</tr>"
+	    +"<tr>"
+	    +"<td><div class='wide present'>Present Thresholds<\/div></td>"
+	    +"<td><div class='narrow present' id='lolo_present"+ channelid +"'><\/div></td>"
+	    +"<td><div class='narrow present' id='lo_present"+ channelid +"'><\/div></td>"
+	    +"<td class='narrow'></td>"
+	    +"<td><div class='narrow present' id='hi_present"+ channelid +"'><\/div></td>"
+	    +"<td><div class='narrow present' id='hihi_present"+ channelid +"'><\/div></td>"
+	    +"<td class='narrow'></td>"
+	    +"</tr>"
+	    +"<tr>"
+	    +"<td><div class='wide approved'>Approved Thresholds<\/div></td>"
+	    +"<td><div class='narrow approved' id='lolo_approved"+ channelid +"'><\/div></td>"
+	    +"<td><div class='narrow approved' id='lo_approved"+ channelid +"'><\/div></td>"
+	    +"<td class='narrow'></td>"
+	    +"<td><div class='narrow approved' id='hi_approved"+ channelid +"'><\/div></td>"
+	    +"<td><div class='narrow approved' id='hihi_approved"+ channelid +"'><\/div></td>"
+	    +"<td class='narrow'></td>"
+	    +"</tr>"
+	    +"</table>"
+	return outputString;
+    };
+    /*class='checkycheese"+ condensedType +"*/
   var makehtml = function(){
-    var channelid="";
+      var channelid="";
     for (var ios = 0; ios<sizes.ioss.length-1; ios++){
       for (var card = 0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel = 0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
-          channelid = "_ios"+ios+"card"+card+"channel"+channel;
-          type=sizes.ioss[ios].cards[card].channels[channel].type
-          $("#everything").append("<div class='channel' id='all"+ channelid + "'>");
-
-          $("#all"+channelid).append(thresholdString(channelid));
+            channelid = "_ios"+ios+"card"+card+"channel"+channel;
+            type=sizes.ioss[ios].cards[card].channels[channel].type;
+	    condensedType = type.replace(/\s+/g, '');
+            $("#everything").append("<div class='channel notAlarmed notUnused type"+ condensedType +"' id='all"+ channelid + "'>");
+            $("#all"+channelid).append(thresholdString(channelid, condensedType));
         }
       }
     }
     for (var channel = 0; channel<sizes.deltav.length; channel++){
-      channelid = "_deltav"+channel;
-      $("#everything").append("<div class='channel' id='all"+ channelid + "'>");
-      $("#all"+channelid).append(thresholdString(channelid));
+	channelid = "_deltav"+channel;
+	type = sizes.deltav[channel].type;
+	condensedType = type.replace(/\s+/g, '');
+	$("#everything").append("<div class='channel notAlarmed notUnused type"+ type +"' id='all"+ channelid + "'>");
+	$("#all"+channelid).append(thresholdString(channelid, condensedType));
     }
   };
 
@@ -205,8 +176,7 @@ $.couch.app(function(app) {
           if (sizes.ioss[ios].cards[card]
           .channels[channel].isEnabled!=null){ //if property exists
             $("#isEnabled_ios"+ios+"card"+card+"channel"+channel)
-            .prop("checked", sizes.ioss[ios].cards[card]
-            .channels[channel].isEnabled);
+            .prop("checked", sizes.ioss[ios].cards[card].channels[channel].isEnabled);
           }
           else {
             $("#isEnabled_ios"+ios+"card"+card+"channel"+channel)
@@ -214,6 +184,9 @@ $.couch.app(function(app) {
           }
           if (unusedChannel(sizes.ioss[ios].cards[card].channels[channel])){
             $("#all_ios"+ios+"card"+card+"channel"+channel).css({"display":"none"});
+	    $("#all_ios"+ios+"card"+card+"channel"+channel).removeClass("notAlarmed");
+	    $("#all_ios"+ios+"card"+card+"channel"+channel).removeClass("notUnused");
+	    $("#all_ios"+ios+"card"+card+"channel"+channel).removeClass("type"+sizes.ioss[ios].cards[card].channels[channel].type); 
           }
         }
       }
@@ -237,6 +210,10 @@ $.couch.app(function(app) {
 
 
   $("#testaudiobutton").click(function(){
+    $("#testaudio").get(0).play();
+  });
+
+  $(".testaudiobutton").click(function(){
     $("#testaudio").get(0).play();
   });
 

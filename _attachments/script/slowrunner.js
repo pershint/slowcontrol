@@ -10,7 +10,7 @@ $.couch.app(function(app) {
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
-  var deltav="/_view/deltav"
+  var deltav="/_view/pi_db"
   var checking = true;
   var approval=false;
   var alarmIndex=0;
@@ -19,7 +19,8 @@ $.couch.app(function(app) {
   var rackAudioOn=true;
   var colorblindModeOn=false;
   var sizes={};
-  
+  var counter1=true;
+  var counter2=true;
 
   var retrieveSizes = function(callback){
     $.getJSON(path+channeldb+options,function(result){
@@ -62,7 +63,7 @@ $.couch.app(function(app) {
         $("#hihi"+channelid).val(thresholdData.deltav[channel].hihi);
       }
       if (thresholdData.deltav[channel].isEnabled!=null){ //if property exists
-        $("#isEnabled"+channelid).prop("checked", thresholdData.deltav[channel].isEnabled);
+          $("#isEnabled"+channelid).prop("checked", thresholdData.deltav[channel].isEnabled);
       }
     }
     if (approved){
@@ -139,7 +140,7 @@ $.couch.app(function(app) {
   var retrievePresentThresholds = function(fill){
     $("#statustext").text("Getting Thresholds...");
     retrieveSizes(function(){
-      $("#statustext").text("Done.");
+      $("#statustext").text("Done loading thresholds. These thesholds were set by "+sizes.submitter+" in "+sizes.ip_address.city+" from computer "+sizes.ip_address.ip+" on "+sizes.sudbury_time);
       if (fill==null){
         fillThresholds(sizes);
       }
@@ -204,9 +205,9 @@ $.couch.app(function(app) {
 
 // Reset everything to okay
     if (colorblindModeOn==false){
-      $(".racks").css({"background-color":"green"});
-      $(".crates").css({"background-color":"green"});
-      $(".box").css({"background-color":"green"});
+      $(".racks").css({"background-color":"forestgreen"});
+      $(".crates").css({"background-color":"forestgreen"});
+      $(".box").css({"background-color":"forestgreen"});
     }
     else {
       $(".racks").css({"background-color":"blue"});
@@ -214,51 +215,56 @@ $.couch.app(function(app) {
       $(".box").css({"background-color":"blue"});
     }
     $(".realvalue").css({"color":"black"});
+    $(".notUnused").addClass("notAlarmed");
 
 // Set anything disabled to yellow
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           if (sizes.ioss[ios].cards[card].channels[channel].isEnabled==0){
-            $("#present_ios"+ios+"card"+card+"channel"+channel).css({"color":"yellow"});
+            $("#present_ios"+ios+"card"+card+"channel"+channel).css({"color":"goldenrod"});
             if (sizes.ioss[ios].cards[card].channels[channel].type=="xl3"){
-              $("#xl3s").css({"background-color":"yellow"});
-              $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channelXL3_"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"yellow"});
+              $("#xl3s").css({"background-color":"goldenrod"});
+              $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channelXL3_"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
            if (sizes.ioss[ios].cards[card].channels[channel].type=="rack"){
               $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id)
-              .css({"background-color":"yellow"});
-              $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"yellow"});
+              .css({"background-color":"goldenrod"});
+              $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"goldenrod"});
             }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="timing rack"){
-              $("#timing").css({"background-color":"yellow"});
-              $("#rackTimingchannel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"yellow"});
+              $("#timing").css({"background-color":"goldenrod"});
+              $("#rackTimingchannel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"goldenrod"});
             }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="crate"){
               $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id)
-              .css({"background-color":"yellow"});
-              $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"yellow"});
+              .css({"background-color":"goldenrod"});
+              $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"goldenrod"});
             }
-            if (sizes.ioss[ios].cards[card].channels[channel].type=="Comp Coil"){
-              $("#coils").css({"background-color":"yellow"});
-              $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"yellow"});
+           if (sizes.ioss[ios].cards[card].channels[channel].type=="Comp Coil"){
+              $("#coils").css({"background-color":"goldenrod"});
+              $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic"){
-              $("#otherE-Stop").css({"background-color":"yellow"});
+              $("#otherE-Stop").css({"background-color":"golenrod"});
             }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
-              $("#otherMine").css({"background-color":"yellow"});
+              $("#otherMine").css({"background-color":"goldenrod"});
             }
+	    if (sizes.ioss[ios].cards[card].channels[channel].type=="MTCD"){
+              $("#otherMTCD").css({"background-color":"goldenrod"});
+            }
+
           }
         }
       }
     }
     for (var channel=0; channel<sizes.deltav.length; channel++){
       if (sizes.deltav[channel].isEnabled==0){
-        $("#present_deltav"+channel).css({"color":"yellow"});
-        $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"yellow"});
-//          $("#holdups").css({"background-color":"yellow"});
-      }
+        $("#present_deltav"+channel).css({"color":"goldenrod"});
+        $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"goldenrod"});
+//          $("#holdups").css({"background-color":""goldenrod"});
+     }
     }
 
 // Set anything with an alarm to red
@@ -266,6 +272,7 @@ $.couch.app(function(app) {
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
           $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"red"});
+	  $("#all_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).removeClass("notAlarmed");
         }
       }
     }
@@ -276,6 +283,7 @@ $.couch.app(function(app) {
         for (var channel=0; channel<numDeltavChannels; channel++){
           if (sizes.deltav[channel].type==alarms.deltav[field][i].type && sizes.deltav[channel].id==alarms.deltav[field][i].id){
             $("#present_deltav"+channel).css({"color":"red"});
+	    $("#all_deltav"+channel).removeClass("notAlarmed");
           }
           // .replace(/\s/g,"") removes underscores.  So, "AV_temp" -> "AVtemp" etc.
           channelid=field+alarms.deltav[field][i].id;
@@ -284,10 +292,10 @@ $.couch.app(function(app) {
       }
     }
     $("#alarmlist").empty();
-    for (var ios=0; ios<sizes.ioss.length-1; ios++){
-      for (var card=0; card<sizes.ioss[ios].cards.length; card++){
-        for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
-          channelInfo=alarms.ioss[ios].cards[card].channels[channel];
+      for (var ios=0; ios<sizes.ioss.length-1; ios++){
+	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
+          for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
+	      channelInfo=alarms.ioss[ios].cards[card].channels[channel];
           if (channelInfo.type=="xl3"){
             $("#xl3s").css({"background-color":"red"});
             $("#crate"+channelInfo.id+"channelXL3_"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
@@ -295,7 +303,11 @@ $.couch.app(function(app) {
           if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
             $("#rack"+channelInfo.id).css({"background-color":"red"});
             $("#rack"+channelInfo.id+"channel"+channelInfo.signal).css({"background-color":"red"});
-            $("#rackaudio").get(0).play();
+            if (channelInfo.reason!="off"){
+		$("#rackaudio").get(0).play();
+		$("#rackaudiobutton").css({"color":"red"});
+		$(".rackaudiobutton").css({"color":"red"});
+	    }
           }
           if (channelInfo.type=="timing rack"){
             $("#timing").css({"background-color":"red"});
@@ -316,11 +328,16 @@ $.couch.app(function(app) {
           if (channelInfo.type=="UPS"){
             $("#otherMine").css({"background-color":"red"});
           }
-          $("#alarmlist").append('<div>'+
-          channelInfo.type + ' ' +
-          channelInfo.id + ' ' +
-          channelInfo.signal + ' ' +
-          channelInfo.voltage + '</div>');
+	  if (channelInfo.type=="MTCD"){
+            $("#otherMTCD").css({"background-color":"red"});
+          }
+          if (channelInfo.reason!="off"){
+	      $("#alarmlist").append('<div>'+
+		channelInfo.type + ' ' +
+		channelInfo.id + ' ' +
+		channelInfo.signal + ' ' +
+		channelInfo.voltage + '</div>');
+	  }
         }
       }
     }
@@ -375,7 +392,7 @@ $.couch.app(function(app) {
       )
     }
     views.push(
-      $.getJSON(path+alarmdb+deltav+options,function(result){
+      $.getJSON(path+alarmdb+"/_view/pi_db"+options,function(result){
         deltavresult=result.rows[0].value;
       })
     );
@@ -418,6 +435,7 @@ $.couch.app(function(app) {
     return arrangedAlarms
   }
 
+    
  
   $("#fillPresentThresholds").click(function(){
     retrievePresentThresholds(true);
@@ -425,23 +443,74 @@ $.couch.app(function(app) {
   $("#fillApprovedThresholds").click(function(){
     retrieveApprovedThresholds(true);
   });
-  $("#showPresentThresholds").click(function(){
-    retrievePresentThresholds(false);
-    $(".present").css({"display":"block"});
-  });
+
+    $("#showPresentThresholds").change(function(){
+        if($(this).is(":checked")){
+	    retrievePresentThresholds(false);
+	    $(".present").css({"display":"block"});
+        }else{
+            $(".present").css({"display":"none"});  
+        };
+    });
+
+    $("#showApprovedThresholds").change(function(){
+        if($(this).is(":checked")){
+	    retrieveApprovedThresholds(false);
+	    $(".approved").css({"display":"block"});
+        }else{
+            $(".approved").css({"display":"none"});  
+        };
+    });
+/*    
   $("#showApprovedThresholds").click(function(){
-    retrieveApprovedThresholds(false);
-    $(".approved").css({"display":"block"});
-  });
-  $("#hidePresentThresholds").click(function(){
-    $(".present").css({"display":"none"});
-  });
-  $("#hideApprovedThresholds").click(function(){
-    $(".approved").css({"display":"none"});
-  });
-  $("#refreshPresent").click(function(){
-    retrievePresentValues();
-  });
+      if (counter2) {
+	  retrieveApprovedThresholds(false);
+	  $(".approved").css({"display":"block"});
+	  $("#showApprovedThresholds").css({'color':'forestgreen'});
+	  counter2=false;
+      } else {
+	  $(".approved").css({"display":"none"});
+	  $("#showApprovedThresholds").css({'color':''});
+	  counter2=true;
+      };
+  });*/
+
+    
+    $("#selectChannels").click(function(){
+	$(".notUnused").css({"display":"none"});
+	var selected=$("#chooseChannels").val();
+	$("#enableChannels").prop("disabled", false);
+	$("#disableChannels").prop("disabled", false);
+	if (selected=='alarms'){
+	    $(".notUnused").css({"display":"block"});
+	    $(".notAlarmed").css({"display":"none"});
+	    $("#enableChannels").prop("disabled", true);
+	    $("#disableChannels").prop("disabled", true);
+	} else if (selected=='allChannels') {
+	    $(".notUnused").css({"display":"block"});
+	    $("#enableChannels").prop("disabled", true);
+	    $("#disableChannels").prop("disabled", true);
+	} else if (selected=='timingrack') {
+	    $(".type"+selected).css({"display":"block"});
+	    $(".typeMTCD").css({"display":"block"});
+	} else {
+	    $(".type"+selected).css({"display":"block"});
+	}
+    });
+
+    $("#enableChannels").click(function(){
+	var selected=$("#chooseChannels").val();
+	$("."+selected).prop("checked", true);
+    });
+
+    $("#disableChannels").click(function(){
+	var selected=$("#chooseChannels").val();
+	$("."+selected).prop("checked", false);
+    });
+
+//  $("#refreshPresent").click(function(){
+//    retrievePresentValues();
+//  });
 
   $("#saveThresholds").click(function(){
     $("#statustext").text("Saving.");
@@ -491,9 +560,14 @@ $.couch.app(function(app) {
         }
       }
     }
-
-    filledThresholdData.timestamp=Math.round(Date.now()/1000);
-    filledThresholdData.approved=$("#approved").prop("checked");    
+      $.get("http://ipinfo.io", function(response) {
+	  filledThresholdData.ip_address = response;
+      }, "jsonp");
+    //filledThresholdData.ip_address = ip_address
+    filledThresholdData.timestamp = presentData.ioss[0].timestamp
+    filledThresholdData.sudbury_time = presentData.ioss[0].sudbury_time
+    filledThresholdData.submitter = $("#name-text").val()
+    filledThresholdData.approved = $("#approved").prop("checked");    
     $("#statustext").text("Saving..");
     $.getJSON(path+"/_uuids?count=1", function(result){
       $("#statustext").text("Saving...");
@@ -501,9 +575,10 @@ $.couch.app(function(app) {
       delete filledThresholdData._rev;
       app.db.saveDoc(filledThresholdData, {
         success : function(resp) {
-          $("#statustext").text("Saved as "+result.uuids[0]);
+          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val());
           formatAll(alarms);
           alert("Save successful");
+	  $("#popupSave").popup("close");  
         },
         error : function(resp, textstatus, message) {
           $("#statustext").text("Save failed: "+message);
@@ -525,16 +600,38 @@ $.couch.app(function(app) {
   $("#rackaudiobutton").click(function(){
     if (rackAudioOn==true){
       rackAudioOn=false;
+      $("#rackaudiobutton").css('color', '');
+      $(".rackaudiobutton").css('color', '');
       $("#rackaudiobutton").text("Rack Audio Alarm Off");
+      $(".rackaudiobutton").text("Rack Audio Alarm Off");
       $("#rackaudio").get(0).muted=true;
     }
     else{
       rackAudioOn=true;
       $("#rackaudiobutton").text("Rack Audio Alarm On");
+      $(".rackaudiobutton").text("Rack Audio Alarm On");
       $("#rackaudio").get(0).muted=false;
     }
   });
 
+  $(".rackaudiobutton").click(function(){
+    if (rackAudioOn==true){
+      rackAudioOn=false;
+      $("#rackaudiobutton").css('color', '');
+      $(".rackaudiobutton").css('color', '');
+      $("#rackaudiobutton").text("Rack Audio Alarm Off");
+      $(".rackaudiobutton").text("Rack Audio Alarm Off");
+      $("#rackaudio").get(0).muted=true;
+    }
+    else{
+      rackAudioOn=true;
+      $("#rackaudiobutton").text("Rack Audio Alarm On");
+      $(".rackaudiobutton").text("Rack Audio Alarm On");
+      $("#rackaudio").get(0).muted=false;
+    }
+  });
+
+    
   $("#colorblindbutton").click(function(){
     if (colorblindModeOn==true){
       colorblindModeOn=false;
@@ -572,5 +669,8 @@ $.couch.app(function(app) {
     retrievePresentThresholds(true);
     waitCheck(checking);
   });
-
+//while(true){
+//  setTimeout(function(){},5000);
+//};
+//alert("Hello")
 });

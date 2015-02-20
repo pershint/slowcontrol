@@ -1,79 +1,69 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
-    <title>Slow Control Alarms</title> {{!comment}}
-    <link rel="stylesheet" href="/slowcontrol-channeldb/_design/slowcontrol/style/main.css" type="text/css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="/_utils/script/json2.js"></script>
+<head>
+<title>Slow Control Alarms</title> {{!comment}}
+<link rel="stylesheet" href="/slowcontrol-channeldb/_design/slowcontrol/style/main.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="/_utils/script/json2.js"></script>
 
-<!--The newest versions-->
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
-    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+<!--jQuery scripts -->
+<!--<script src="/slowcontrol-channeldb/_design/slowcontrol/script/jquery.js"></script>-->
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
-<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<!--<script src="/slowcontrol-channeldb/_design/slowcontrol/script/jquery.mobile.js"></script>-->
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
-<!--The (old) versions in use-->
-<!--    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/jquery.js"></script>
-    <!--script src="http://code.jquery.com/jquery-1.8.2.min.js"></script-->
-<!--    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/jquery.mobile.js"></script>
-    <!--script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script-->
-<!--    <link rel="stylesheet" href="/slowcontrol-channeldb/_design/slowcontrol/style/jquery.mobile.css" type="text/css">
-    <!--link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" /-->
+<!--<link rel="stylesheet" href="/slowcontrol-channeldb/_design/slowcontrol/style/jquery.mobile.css" type="text/css">-->
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
 
 <!--jquery couch stuff-->
-    <script src="/_utils/script/jquery.couch.js"></script>
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/vendor/couchapp/jquery.couch.app.js"></script>
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/vendor/couchapp/jquery.couch.app.util.js"></script>
+<!--The following is not compatible with jquery since couchdb is -->
+<!--running on an old version. Thus, a good (newer) version of jquery.couch.js -->
+<!--has been placed in the couchapp directory-->
+<!--<script src="/_utils/script/jquery.couch.js"></script>-->
+<script src="/slowcontrol-channeldb/_design/slowcontrol/vendor/couchapp/jquery.couch.js"></script>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/vendor/couchapp/jquery.couch.app.js"></script>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/vendor/couchapp/jquery.couch.app.util.js"></script>
     <!-- script src="../../script/app.js"></script -->
     
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/highcharts.js" type="text/javascript"></script>
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/themes/grid.js" type="text/javascript"></script> 
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/modules/exporting.js" type="text/javascript"></script>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/script/highcharts.js" type="text/javascript"></script>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/script/themes/grid.js" type="text/javascript"></script> 
+<script src="/slowcontrol-channeldb/_design/slowcontrol/script/modules/exporting.js" type="text/javascript"></script>
 
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/highslide/highslide-full.min.js" type="text/javascript"></script>
-    <script src="/slowcontrol-channeldb/_design/slowcontrol/script/highslide/highslide.config.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="/slowcontrol-channeldb/_design/slowcontrol/style/highslide.css" />
-  </head>
-  <body>
-    <div data-role="page" id="alarmsdetail">
-      {{!<div id="account"></div>}}
-      <!--Detail-->
-      <div data-role="header" class="ui-state-persist" data-position="fixed">
-	<h1>Slow Control Alarms</h1>
-	<a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
-	<!--<a id="rackaudiobutton" loop="true" data-icon="alert">Rack Audio Alarm On</a>
-        <audio preload="true" id="rackaudio" loop="true">
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.ogg" type="audio/ogg" />
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.mp3" type="audio/mp3" />
-        </audio>-->
-	<div data-role="navbar">
-          <ul>
-            <li><a href="#alarmsoverview" data-icon="grid">Overview</a>
-	    <li><a href="#alarmsdetail" class="ui-btn-active ui-state-persist" data-icon="bullets">Detail</a>
-	    <li><a href="#alarmslist" data-icon="alert">Alarm List</a>
-            <li><a href="#thresholds" data-icon="edit">Thresholds</a>
-            <li><a href="#graphs" data-icon="bars">Graphs</a>
-          </ul>
-	</div>
-      </div>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/script/highslide/highslide-full.min.js" type="text/javascript"></script>
+<script src="/slowcontrol-channeldb/_design/slowcontrol/script/highslide/highslide.config.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/slowcontrol-channeldb/_design/slowcontrol/style/highslide.css" />
+</head>
+<body>
+<div data-role="page" id="alarmsdetail">
+  {{!<div id="account"></div>}}
+  <div data-role="header" class="ui-state-persist" data-position="fixed">
+    <h1>Slow Control Alarms</h1>
+    <a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
+  <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+    <a id="rackaudiobutton" loop="true" class="ui-btn ui-btn-icon-right ui-icon-comment">Rack Audio Alarm On</a>
+    <a id="testaudiobutton" class="ui-btn ui-btn-icon-right ui-icon-gear">Test Audio</a>
+    <a id="colorblindbutton" class="ui-btn ui-btn-icon-right ui-icon-eye">Colorblind Mode Off</a>
+    <audio preload="true" id="testaudio">
+    <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.ogg" type="audio/ogg" />
+    <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.mp3" type="audio/mp3" />
+    </audio>
+    <audio preload="true" id="rackaudio" loop="true">
+    <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.ogg" type="audio/ogg" />
+    <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.mp3" type="audio/mp3" />
+    </audio>
+  </div><!-- /controlgroup -->
+  <div data-role="navbar">
+    <ul>
+      <li><a href="#alarmsdetail" class="ui-btn-active ui-state-persist" data-icon="grid">Overview</a>
+      <li><a href="#thresholds" data-icon="edit">Channel Thresholds</a>
+      <li><a href="#graphs" data-icon="bars">Graphs</a>
+    </ul>
+  </div><!-- /navbar -->
+  </div><!-- /header -->
       <p></p>
-      <div data-role="none" id="audio">
-        <button id="rackaudiobutton" class="niceButton" data-role="none" loop="true">Rack Audio Alarm On</button>
-	<button id="testaudiobutton" class="niceButton" data-role="none">Test Audio</button>
-        <button id="colorblindbutton" class="niceButton" data-role="none">Colorblind Mode Off</button>
-        <audio preload="true" id="testaudio">
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.ogg" type="audio/ogg" />
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.mp3" type="audio/mp3" />
-        </audio>
-        <audio preload="true" id="rackaudio" loop="true">
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.ogg" type="audio/ogg" />
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.mp3" type="audio/mp3" />
-        </audio>
-      </div>
       <div id="wheretext"></div>
-      <div style="width:100%;height:175px">
+      <div style="width:100%;height:160px">
         <div>
           Rack Voltages
         </div>
@@ -89,9 +79,9 @@
         {{/racks}}
       </div>
       
-      <div style="width:100%;height:175px">
+      <div style="width:100%;height:90px">
         <div>
-          Crate Currents
+          Crate XL3's
         </div>
         {{#crates}}
         <div class="{{style}}">
@@ -104,8 +94,35 @@
         </div>
         {{/crates}}
       </div>
+
+      <div style="width:100%;height:90px">
+        <div>
+          Others
+        </div>
+	<div class="big">
+          <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V</div>
+        </div>
+	<div class="big">
+          <div id="otherE-Stop" class="box big" style="clear:both">E-Stop/HV Disable</div>
+        </div>
+        <div class="big">
+          <div id="otherMine" class="box big" style="clear:both">Mine Power</div>
+        </div>
+	<div class="big">
+          <div id="cavity_water_temp1" class="box big" style="clear:both">Cavity Water Temp</div>
+        </div>
+	<div class="big">
+          <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level</div>
+        </div>
+	<div class="big">
+          <div id="deck_temp1" class="box big" style="clear:both">Deck Temperature</div>
+        </div>
+	<div class="big">
+          <div id="deck_humidity1" class="box big" style="clear:both">Deck Humidity</div>
+        </div>
+      </div>
       
-      <div style="width:100%;height:100px">
+      <div style="width:100%;height:90px">
         <div>
           Comp Coil Status
         </div>
@@ -145,6 +162,7 @@
         </div>
         {{/holddownropes}}
       </div>
+
       <div style="width:100%;height:50px">
         <div>
           Equator monitors
@@ -156,42 +174,6 @@
           </div>
         </div>
         {{/equator}}
-      </div>
-      <div style="width:100%;height:50px">
-        <div>
-          AV temp
-        </div>
-        {{#AVtemp}}
-        <div class="{{style}}">
-          <div id="AV_temp{{id}}" class="box inside">
-            {{id}}
-          </div>
-        </div>
-        {{/AVtemp}}
-      </div>
-      <div style="width:100%;height:50px">
-        <div>
-          Cavity water level
-        </div>
-        {{#cavitywaterlevel}}
-        <div class="{{style}}">
-          <div id="cavity_water_level{{id}}" class="box inside">
-            {{id}}
-          </div>
-        </div>
-        {{/cavitywaterlevel}}
-      </div>
-      
-      <div style="width:100%;height:150px">
-        <div>
-          Others
-        </div>
-        <div class="big">
-          <div id="otherE-Stop" class="box big" style="clear:both">E-Stop/HV Disable</div>
-        </div>
-        <div class="big">
-          <div id="otherMine" class="box big" style="clear:both">Mine Power</div>
-        </div>
       </div>
       
       <div style="width:100%;height:175px">
@@ -243,183 +225,127 @@
             </span>
             <span  class="timetable narrow" id="time_alarm_deltav"> 
             </span>
-          </div>
-        </div>
-      </div>
+	  </div>
+	  </div>
+	  </div>
     </div>
 
-    <div data-role="page" id="alarmsoverview">
-      {{!<div id="account"></div>}}
-      <!--Overview-->
-      <div data-role="header" class="ui-state-persist" data-position="fixed">
-	<h1>Slow Control Alarms</h1>
-	<a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
-	<div data-role="navbar">
-          <ul>
-            <li><a href="#alarmsoverview" class="ui-btn-active ui-state-persist" data-icon="grid">Overview</a>
-	    <li><a href="#alarmsdetail"  data-icon="bullets">Detail</a>
-	    <li><a href="#alarmslist" data-icon="alert">Alarm List</a>
-            <li><a href="#thresholds" data-icon="edit">Thresholds</a>
-            <li><a href="#graphs" data-icon="bars">Graphs</a>
-          </ul>
-	</div>
-      </div>
-      <p></p>
-      <div data-role="none" id="audio">
-        <button id="rackaudiobutton" class="niceButton" data-role="none" loop="true">Rack Audio Alarm On</button>
-	<button id="testaudiobutton" class="niceButton" data-role="none">Test Audio</button>
-        <button id="colorblindbutton" class="niceButton" data-role="none">Colorblind Mode Off</button>
-        <audio preload="true" id="testaudio">
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.ogg" type="audio/ogg" />
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.mp3" type="audio/mp3" />
-        </audio>
-        <audio preload="true" id="rackaudio" loop="true">
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.ogg" type="audio/ogg" />
-          <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/rackaudio.mp3" type="audio/mp3" />
-        </audio>
-      </div>
-      <div id="racks" style="width:100%;float:left;clear:both">
-        <div class="racks" id="rack1">Rack 1 Voltage
-          <div class="crates" id="crate0">Crate 0 Current</div>
-          <div class="crates" id="crate1">Crate 1 Current</div>
-        </div>
-        <div class="racks" id="rack2">Rack 2 Voltage
-          <div class="crates" id="crate2">Crate 2 Current</div>
-          <div class="crates" id="crate3">Crate 3 Current</div>
-        </div>
-        <div class="racks" id="rack3">Rack 3 Voltage
-          <div class="crates" id="crate4">Crate 4 Current</div>
-        </div>
-        <div class="racks" id="rack4">Rack 4 Voltage
-          <div class="crates" id="crate5">Crate 5 Current</div>
-          <div class="crates" id="crate6">Crate 6 Current</div>
-        </div>
-        <div class="racks" id="rack5">Rack 5 Voltage
-          <div class="crates" id="crate7">Crate 7 Current</div>
-          <div class="crates" id="crate8">Crate 8 Current</div>
-        </div>
-        <div class="racks" id="rack6">Rack 6 Voltage
-          <div class="crates" id="crate9">Crate 9 Current</div>
-          <div class="crates" id="crate10">Crate 10 Current</div>
-        </div>
-        <div class="racks" id="rack7">Rack 7 Voltage
-          <div class="crates" id="crate11">Crate 11 Current</div>
-        </div>
-        <div class="racks" id="rack8">Rack 8 Voltage
-          <div class="crates" id="crate12">Crate 12 Current</div>
-          <div class="crates" id="crate13">Crate 13 Current</div>
-        </div>
-        <div class="racks" id="rack9">Rack 9 Voltage
-          <div class="crates" id="crate14">Crate 14 Current</div>
-          <div class="crates" id="crate15">Crate 15 Current</div>
-        </div>
-        <div class="racks" id="rack10">Rack 10 Voltage
-          <div class="crates" id="crate16">Crate 16 Current</div>
-        </div>
-        <div class="racks" id="rack11">Rack 11 Voltage
-          <div class="crates" id="crate17">Crate 17 Current</div>
-          <div class="crates" id="crate18">Crate 18 Current</div>
-        </div>
-      </div>
-      <div id="moreracks" style="width:100%;float:left;clear:both">
-        <div class="racks" id="timing">Timing Rack Voltage</div>
-        <div class="racks" id="xl3s">XL3s</div>
-        <div class="racks" id="coils">Comp Coils</div>
-      </div>
-    </div>
-
-    <div data-role="page" id="alarmslist">
-      {{!<div id="account"></div>}}
-      <!--Alarm List-->
-      <div data-role="header" class="ui-state-persist" data-position="fixed">
-	<h1>Slow Control Alarms</h1>
-	<a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
-	<div data-role="navbar">
-          <ul>
-            <li><a href="#alarmsoverview" data-icon="grid">Overview</a>
-	    <li><a href="#alarmsdetail"  data-icon="bullets">Detail</a>
-	    <li><a href="#alarmslist" class="ui-btn-active ui-state-persist" data-icon="alert">Alarm List</a>
-            <li><a href="#thresholds" data-icon="edit">Thresholds</a>
-            <li><a href="#graphs" data-icon="bars">Graphs</a>
-          </ul>
-	</div>
-      </div>
-      <p></p>
-      <div id="wheretext"></div>
-      Alarm list 
-      <div id="alarmlist" style="width:100%;float:left;clear:both"></div>
-    </div>
 
     <div data-role="page" id="thresholds">
       {{!<div id="account"></div>}}
-      <!--Thresholds-->
       <div data-role="header" class="ui-state-persist" data-position="fixed">
 	<h1>Slow Control Alarms</h1>
 	<a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
-	<div data-role="navbar">
-          <ul>
-            <li><a href="#alarmsoverview" data-icon="grid">Overview</a>
-	    <li><a href="#alarmsdetail" data-icon="bullets">Detail</a>
-	    <li><a href="#alarmslist" data-icon="alert">Alarm List</a>
-            <li><a href="#thresholds" class="ui-btn-active ui-state-persist" data-icon="edit">Thresholds</a>
-            <li><a href="#graphs" data-icon="bars">Graphs</a>
-          </ul>
-	</div>
+      <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+	<a class="rackaudiobutton ui-btn ui-btn-icon-right ui-icon-comment">Rack Audio Alarm On</a>
+	<a class="testaudiobutton ui-btn ui-btn-icon-right ui-icon-gear">Test Audio</a>
       </div>
-      <p></p>
+      <div data-role="navbar">
+	<ul>
+	  <li><a href="#alarmsdetail" data-icon="grid">Overview</a>
+	  <li><a href="#thresholds" class="ui-btn-active ui-state-persist" data-icon="edit">Channel Thresholds</a>
+	  <li><a href="#graphs" data-icon="bars">Graphs</a>
+	</ul>
+      <!-- <button id="format">Format</button>-->
+      <!--<div id="approval" style="display:none"> Approve: <input type="checkbox" label="Approve:" id="approved" data-role="none" /></div>-->
+      </div>
+      </div>
+      <form data-inline="true">
+      <div class="ui-field-contain">
+	<legend>Choose Channels to display:</legend>
+	<select name="chooseChannels" id="chooseChannels" data-inline="true" data-native-menu="false">
+	  <option>Choose Channels...</option>
+	  <option value="alarms">Alarms</option>
+	  <option value="allChannels">All Channels</option>
+	  <option value="rack">Rack Voltages</option>
+	  <option value="timingrack">Timing Rack</option>
+	  <option value="xl3">XL3's</option>
+	  <option value="crate">Crate Currents</option>
+	  <option value="CompCoil">Comp Coils</option>
+	  <option value="holdup_rope">Hold-up Ropes</option>
+	  <option value="holddown_rope">Hold-down Ropes</option>
+	  <option value="equator_monitor">Equator Monitors</option>
+	  <option value="cover_gas">Cover Gas</option>
+	</select>
+	<button type="button" id="selectChannels" class="ui-btn	ui-btn-inline">Select</button>
+	<button type="button" id="enableChannels" class="ui-btn ui-mini ui-btn-inline" disabled>Enable All</button>
+	<button type="button" id="disableChannels" class="ui-btn ui-mini ui-btn-inline" disabled>Disable All</button>
+	<a href="#popupSave" data-rel="popup"
+	data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left"
+	data-transition="pop">Save Changes</a>
+      <div data-role="popup" id="popupSave" class="ui-corner-all">
+	<form>
+      <div style="padding:10px 20px;">
+	<h3>Enter your name:</h3>
+	<label for="name-text" class="ui-hidden-accessible">Name:</label>
+	<input type="text" name="name-text" id="name-text" value="" placeholder="Name">
+	<button type="submit" id="saveThresholds" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-check">Submit Changes</button>
+      </div>
+      </form>
+      </div>
+      <div>
+	<table>
+	  <tr>
+	    <td>
+	      <label for="showPresentThresholds">Show Present Thresholds:</label>
+	      <input type="checkbox" data-role="flipswitch" name="showPresentThresholds" id="showPresentThresholds">
+	    </td>
+	    <td>
+	      <label for="showApprovedThresholds">Show Approved Thresholds:</label>
+	      <input type="checkbox" data-role="flipswitch" name="showApprovedThreshold" id="showApprovedThresholds">
+	    </td>
+	  </tr>
+	  <tr>
+	    <td><button type="button" class="ui-btn ui-mini" id="fillPresentThresholds">Fill Present Thresholds</button></td>
+	    <td><button type="button" class="ui-btn ui-mini" id="fillApprovedThresholds">Fill Approved Thresholds</button></td>
+	  </tr>
+	</table>
+      </div>
+      </form>
+      
+      </div>
+      
       <div id="statustext"></div>
       <div id="statustext1"></div>
-      <div class="wideColumn">
-        <button id="fillPresentThresholds" class="niceButton" data-role="none">Fill Present Thresholds</button>
-        <button id="fillApprovedThresholds" class="niceButton" data-role="none">Fill Approved Thresholds</button>
-      </div>
-      <div class="wideColumn" style="clear:none">
-        <button id="showPresentThresholds" class="niceButton" data-role="none">Show Present Thresholds</button>
-        <button id="showApprovedThresholds" class="niceButton" data-role="none">Show Approved Thresholds</button>
-      </div>
-      <div class="wideColumn" style="clear:none">
-        <button id="hidePresentThresholds" class="niceButton" data-role="none">Hide Present Thresholds</button>
-        <button id="hideApprovedThresholds" class="niceButton" data-role="none">Hide Approved Thresholds</button>
-      </div>
-      <div class="wideColumn" style="clear:none" data-role="none">
-        <button id="refreshPresent" class="niceButton" data-role="none">Refresh Present Values</button>
-      </div>
-      <button id="saveThresholds" class="niceButton" data-role="none">Save Thresholds</button>
-      <!-- button id="format" class="niceButton" data-role="none">Format</button -->
-      <div id="approval" style="display:none">
-        Approve: <input type="checkbox" label="Approve:" id="approved" data-role="none" />
-      </div>
       <div class="header">
-        <div class="wideColumn">Channel Name</div>
-        <div class="narrowColumn">LoLo</div>
-        <div class="narrowColumn">Lo</div>
-        <div class="narrowColumn">Presently</div>
-        <div class="narrowColumn">Hi</div>
-        <div class="narrowColumn">HiHi</div>
-        <div class="narrowColumn">Enabled</div>
+      <table>
+	<tr>
+	  <td class="wide">Channel Name</td>
+	  <td class="narrow">LoLo</td>
+	  <td class="narrow">Lo</td>
+	  <td class="narrow">Presently</td>
+	  <td class="narrow">Hi</td>
+	  <td class="narrow">HiHi</td>
+	  <td class="narrow">is Enabled</td>
+	</tr>
+      </table>
       </div>
       <div id="everything"></div>
-    </div>
+      <div id="alarmsonly"></div>
+      </div>
+      </div>
 
-    <div data-role="page" id="graphs">
-      <!--Graphs-->
+      
+      <div data-role="page" id="graphs">
       <div data-role="header" class="ui-state-persist" data-position="fixed">
 	<h1>Slow Control Alarms</h1>
 	<a href="http://snopl.us" data-icon="arrow-l">Return to snopl.us</a>
-	<div data-role="navbar">
+      <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+	<a class="rackaudiobutton ui-btn ui-btn-icon-right ui-icon-comment">Rack Audio Alarm On</a>
+	<a class="testaudiobutton ui-btn ui-btn-icon-right ui-icon-gear">Test Audio</a>
+      </div>
+      <div data-role="navbar">
           <ul>
-            <li><a href="#alarmsoverview" data-icon="grid">Overview</a>
-	    <li><a href="#alarmsdetail" data-icon="bullets">Detail</a>
-	    <li><a href="#alarmslist" data-icon="alert">Alarm List</a>
-            <li><a href="#thresholds" data-icon="edit">Thresholds</a>
+	    <li><a href="#alarmsdetail" data-icon="grid">Overview</a>
+            <li><a href="#thresholds" data-icon="edit">Channel Thresholds</a>
             <li><a href="#graphs" class="ui-btn-active ui-state-persist" data-icon="bars">Graphs</a>
           </ul>
 	</div>
       </div>
-      <p></p>
-      <button id="deleteplot" class="niceButton" data-role="none">Delete</button>
-      <select id="name_dropdown" data-role="none"></select>
-      <button id="addplot" class="niceButton" data-role="none">Add</button>
+      <p display="inline">Choose variable to plot:</p>
+      <select id="name_dropdown" data-inline="true" width="200px"></select>
+      <button id="addplot" class="ui-btn ui-btn-inline ui-icon-plus ui-btn-icon-right">Add</button>
+      <button id="deleteplot" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-right">Delete</button>	
       <div id="graphstatus"></div>
       <div id="plots">
       </div>

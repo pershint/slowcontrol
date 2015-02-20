@@ -46,13 +46,6 @@ function (newDoc, oldDoc, userCtx, secObj) {
       }
     }
   }
-  if (!newDoc.submitter){
-      failedchannel.type="";
-      failedchannel.id=""
-      failedchannel.signal=""
-      failtext = "You must enter your name.";
-      sofarsogood = false;
-  }
   if (!sofarsogood){
     v.forbidden(""+failedchannel.type+" "+failedchannel.id+" "+failedchannel.signal+" "+failtext);
   }
