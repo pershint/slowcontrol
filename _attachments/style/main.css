@@ -13,17 +13,12 @@ h1 {
 }
 .chartcontainer{
 position:relative;
-height:500px;
-}
-.detailchart{
-position:relative;
-width:100%;
+height:450px;
 }
 .masterchart{
 position:relative;
-top:300px;
-height:80px;
-width:100%;
+height:400px;
+min-width:310px;
 }
 .box{
 /*background-color:green;*/
@@ -127,16 +122,13 @@ width:5em;
 .approved{
 display:none;
 color:green;
-/*height:24px;*/
 }
 .present{
 display:none;
 color:blue;
-/*height:24px;*/
 }
 .set{
 display:block;
-/*height:16px;*/
 }
 
 .red{
