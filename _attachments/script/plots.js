@@ -107,8 +107,14 @@ $.couch.app(function(app) {
 			};
 		    }
 		    for (var row=0; row<hard[ios].length; row++){
-			for (channel=0; channel<arranged[ios].cards[card].channels.length; channel++){
-			    arranged[ios].cards[card].channels[channel].data[row]=[hard[ios][row].key*1000,hard[ios][row].value[cardName][property][channel]];
+			try{
+			    for (channel=0; channel<arranged[ios].cards[card].channels.length; channel++){
+			        arranged[ios].cards[card].channels[channel].data[row]=[hard[ios][row].key*1000,hard[ios][row].value[cardName][property][channel]];
+			    }
+			}
+			catch(err){
+			    // Bad row in your data, either from empty card names or bad channel entries.  Skip row and move on
+			    row++
 			}
 		    }
 		}
