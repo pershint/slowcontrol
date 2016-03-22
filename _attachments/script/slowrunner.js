@@ -313,7 +313,7 @@ $.couch.app(function(app) {
 		$("#rackaudio").get(0).play();
 		$("#rackaudiobutton").css({"color":"red"});
 		$(".rackaudiobutton").css({"color":"red"});
-	    }
+            }
 
           }
           if (channelInfo.type=="timing rack"){
@@ -329,6 +329,7 @@ $.couch.app(function(app) {
 		$(".rackaudiobutton").css({"color":"red"});
 	    }
           }
+
           if (channelInfo.type=="crate"){
             $("#crate"+channelInfo.id)
             .css({"background-color":"red"});
@@ -379,16 +380,16 @@ $.couch.app(function(app) {
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
 	      channelInfo=alarms.ioss[ios].cards[card].channels[channel];
-	if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
-            if (channelInfo.reason="action"){
-	    window.alert("Testing... no actual shutdown now.  WARNING:  Rack" + channelInfo.id + " voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
-	    }   
-        }
-        if (channelInfo.type=="timing rack"){
-	    if (channelInfo.reason!="action"){
-	        window.alert("Testing...no actual shutdown now.  WARNING:  The Timing Rack voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
-	    }
-          } 
+	      if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
+                  if (channelInfo.reason=="action"){
+	              window.alert("Testing... no actual shutdown now.  WARNING:  Rack" + channelInfo.id + " voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
+	          }   
+              }
+              if (channelInfo.type=="timing rack"){
+	          if (channelInfo.reason=="action"){
+	              window.alert("Testing...no actual shutdown now.  WARNING:  The Timing Rack voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
+	          }
+              } 
         }
       }
     }
@@ -445,7 +446,7 @@ $.couch.app(function(app) {
       alarms=arrangeAlarmsLikeChanneldb(hardToReadAlarms);
       $("#rackaudio").get(0).pause();
       formatAll();
-      EmergencyRackShutdownCheck();
+      //EmergencyRackShutdownCheck();
       $("#time_alarm_deltav").text(Math.round(Date.now()/1000)-alarms.deltav.timestamp);
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
         $("#time_alarm_ios"+(ios+1)).text(Math.round(Date.now()/1000)-hardToReadAlarms[ios].timestamp);
