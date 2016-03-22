@@ -271,7 +271,8 @@ $.couch.app(function(app) {
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
-          $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"red"});
+          //FIXME: Add the gray coloring to racks that have been set to "off"
+	  $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"red"});
 	  $("#all_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).removeClass("notAlarmed");
         }
       }
@@ -296,23 +297,39 @@ $.couch.app(function(app) {
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
 	      channelInfo=alarms.ioss[ios].cards[card].channels[channel];
+	  //FIXME Let's do the same thing with the xl3s eventually also as the racks regarding disabled/enabled!
           if (channelInfo.type=="xl3"){
             $("#xl3s").css({"background-color":"red"});
             $("#crate"+channelInfo.id+"channelXL3_"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
           }
           if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
-            $("#rack"+channelInfo.id).css({"background-color":"red"});
-            $("#rack"+channelInfo.id+"channel"+channelInfo.signal).css({"background-color":"red"});
+	    //Start by assuming the rack is off
+            $("#rack"+channelInfo.id).css({"background-color":"gray"});
+            $("#rack"+channelInfo.id+"channel"+channelInfo.signal).css({"background-color":"gray"});
+	    //If the reason for being in the alarm list is not "off", set the boxes red and activate audio
             if (channelInfo.reason!="off"){
+		$("#rack"+channelInfo.id).css({"background-color":"red"});
+		$("#rack"+channelInfo.id+"channel"+channelInfo.signal).css({"background-color":"red"});
+		$("#rackaudio").get(0).play();
+		$("#rackaudiobutton").css({"color":"red"});
+		$(".rackaudiobutton").css({"color":"red"});
+            }
+
+          }
+          if (channelInfo.type=="timing rack"){
+            //Same as racks; start by assuming the rack is just off
+	    $("#timing").css({"background-color":"gray"});
+            $("#rackTimingchannel"+channelInfo.signal).css({"background-color":"gray"});
+            //Now, if the rack is in this list and not off, really throw the alarm
+	    if (channelInfo.reason!="off"){
+                $("#timing").css({"background-color":"red"});
+		$("#rackTimingchannel"+channelInfo.signal).css({"background-color":"red"});
 		$("#rackaudio").get(0).play();
 		$("#rackaudiobutton").css({"color":"red"});
 		$(".rackaudiobutton").css({"color":"red"});
 	    }
           }
-          if (channelInfo.type=="timing rack"){
-            $("#timing").css({"background-color":"red"});
-            $("#rackTimingchannel"+channelInfo.signal).css({"background-color":"red"});
-          }
+
           if (channelInfo.type=="crate"){
             $("#crate"+channelInfo.id)
             .css({"background-color":"red"});
@@ -356,6 +373,26 @@ $.couch.app(function(app) {
       }
     }
 //    $("#statustext").text("Done.");
+  }
+
+  var EmergencyRackShutdownCheck=function(){
+    for (var ios=0; ios<sizes.ioss.length-1; ios++){
+      for (var card=0; card<sizes.ioss[ios].cards.length; card++){
+        for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
+	      channelInfo=alarms.ioss[ios].cards[card].channels[channel];
+	      if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
+                  if (channelInfo.reason=="action"){
+	              window.alert("Testing... no actual shutdown now.  WARNING:  Rack" + channelInfo.id + " voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
+	          }   
+              }
+              if (channelInfo.type=="timing rack"){
+	          if (channelInfo.reason=="action"){
+	              window.alert("Testing...no actual shutdown now.  WARNING:  The Timing Rack voltage " + channelInfo.signal + " Has gone beyond it's hihi or lolo limits.  A 5 minute timer has begun as of (have webpage insert time).  Either correct the rack voltage or disable the alarm in the threhsolds page to prevent automatic rack shutdown.");
+	          }
+              } 
+        }
+      }
+    }
   }
 
   var poll=function(polling, seq){
@@ -409,6 +446,7 @@ $.couch.app(function(app) {
       alarms=arrangeAlarmsLikeChanneldb(hardToReadAlarms);
       $("#rackaudio").get(0).pause();
       formatAll();
+      //EmergencyRackShutdownCheck();
       $("#time_alarm_deltav").text(Math.round(Date.now()/1000)-alarms.deltav.timestamp);
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
         $("#time_alarm_ios"+(ios+1)).text(Math.round(Date.now()/1000)-hardToReadAlarms[ios].timestamp);
