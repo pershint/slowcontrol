@@ -114,7 +114,8 @@ $.couch.app(function(app) {
 			}
 			catch(err){
 			    // Bad row in your data, either from empty card names or bad channel entries.  Skip row and move on
-			    window.alert("WARNING: Bad data row reading from CouchDB.  IOS: " + ios + " card: " + cardName + " channel: " + channel + " Database: " + db_list[db]["name"] + " timestamp: " + hard[ios][row].key + "  Skipping row and continuing graphing, but check couchDB for data errors");
+			    //FIXME Make a better pop-up window here; the window alert freezes everything up.
+                            //window.alert("WARNING: Bad data row reading from CouchDB.  IOS: " + ios + " card: " + cardName + " channel: " + channel + " Database: " + db_list[db]["name"] + " timestamp: " + hard[ios][row].key + "  Skipping row and continuing graphing, but check couchDB for data errors");
 			    row++;
 			}
 		    }
