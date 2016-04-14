@@ -346,7 +346,10 @@ $.couch.app(function(app) {
             $("#otherMine").css({"background-color":"red"});
           }
 	  if (channelInfo.type=="MTCD"){
-            $("#otherMTCD").css({"background-color":"red"});
+            $("#otherMTCD").css({"background-color":"gray"});
+            if (channelInfo.reason!="off"){
+              $("#otherMTCD").css({"background-color":"red"});
+            }
           }
           if (channelInfo.reason!="off"){
 	      $("#alarmlist").append('<div>'+
