@@ -171,7 +171,23 @@
         </div>
         {{/equator}}
       </div>
-      
+
+      <div style="width:100%;height:50px">
+        <div>
+          Detector Server/IBoot3 Statuses
+        </div>
+        {{#conns}}
+        <div class="{{style}}">
+          <div id="DetServerConn" class="box big">
+            DetServerConn OK
+          </div>
+          <div id="IBoot3" class="box big">
+            IBoot3 ON
+          </div>
+        </div>
+        {{/conns}}
+      </div>
+     
       <div style="width:100%;height:175px">
         <div>
           Page updates (browswer time minus latest document timestamp)
