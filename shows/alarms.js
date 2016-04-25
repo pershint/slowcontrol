@@ -12,7 +12,8 @@ function(doc, req) {
     "other":[],
     "equator":[],
     "AVtemp":[],
-    "cavitywaterlevel":[]
+    "cavitywaterlevel":[],
+    "conns":[]
   };
   
   var channels = {
@@ -83,6 +84,11 @@ function(doc, req) {
       "channels":[""],
       "ids":[1,2,3,4],
       "styles":["one","one","one","one"]
+    },
+    "conns":{
+      "channels":[""],
+      "ids":["DetServerConn","IBoot3"],
+      "styles":["one","one"]
     }
   };
 
@@ -158,6 +164,12 @@ function(doc, req) {
     };
   }
 
+  for (var index=0; index<channels.conns.ids.length; index++){
+    data.conns[index]={
+      "id":channels.conns.ids[index],
+      "style":channels.conns.styles[index],
+    };
+  }
   for (var index=0; index<channels.other.ids.length; index++){
     data.other[index]={
       "id":channels.other.ids[index],
