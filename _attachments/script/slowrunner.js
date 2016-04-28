@@ -461,7 +461,8 @@ $.couch.app(function(app) {
   var arrangeAlarmsLikeChanneldb = function(hardToReadAlarms){
     var arrangedAlarms={
       "ioss":[],
-      "deltav":[]
+      "deltav":[],
+      "detserver":[]
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       arrangedAlarms.ioss.push({"cards":[],"ios":sizes.ioss[ios].ios});
