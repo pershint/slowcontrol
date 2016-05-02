@@ -95,6 +95,14 @@ $.couch.app(function(app) {
   };
 
 
+  var fillLegend = function(){
+    $("#OKSamp").css({"background-color":"green"});
+    $("#AlarmSamp").css({"background-color":"red"});
+    $("#OFFSamp").css({"background-color":"gray"});
+    $("#DisableSamp").css({"background-color":"goldenrod"});
+    $("#OLDSamp").css({"background-color":"cyan"});
+  };
+
   var fillNames = function(){
     var nameindex=0;
     for (var ios = 0; ios<sizes.ioss.length-1; ios++){
@@ -220,5 +228,6 @@ $.couch.app(function(app) {
   retrieveSizes(function(){
     makehtml();
     fillNames();
+    fillLegend();
   });
 });
