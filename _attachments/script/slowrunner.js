@@ -360,7 +360,10 @@ $.couch.app(function(app) {
             $("#otherMTCD").css({"background-color":"gray"});
             if (channelInfo.reason!="off"){
               $("#otherMTCD").css({"background-color":"red"});
-            }
+              $("#rackaudio").get(0).play();
+              $("#rackaudiobutton").css({"color":"red"});
+	      $(".rackaudiobutton").css({"color":"red"});
+           }
           }
           if (channelInfo.reason!="off"){
 	      $("#alarmlist").append('<div>'+
