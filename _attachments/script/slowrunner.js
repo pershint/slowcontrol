@@ -171,13 +171,13 @@ $.couch.app(function(app) {
     var deltavresult=[];
     var respheader=[];
     for (var i=0; i<recents.length; i++){
-//      dat=$.getJSON(path+datadb+recents[i]+options);
-//      gethead=dat.getAllResponseHeaders();
+      dat=$.getJSON(path+datadb+recents[i]+options);
+      respheader.push(dat.getAllResponseHeaders());
       views.push(
         $.getJSON(path+datadb+recents[i]+options,function(result){
           //collects the results but in whatever order they arrive
           iosresults.push(result.rows[0].value);
-          respheader.push(result.getAllResponseHeaders();
+//          respheader.push(result.getAllResponseHeaders());
         })
       ); 
     }
@@ -194,6 +194,7 @@ $.couch.app(function(app) {
       presentData={
         "ioss":[],
         "deltav":deltavresult,
+        "header":respheader
       };
       for (var i=0; i<iosresults.length; i++){
         resultpos=$.grep(iosresults, function(e,f){return e.ios == i+1;});
