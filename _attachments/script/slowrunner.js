@@ -169,11 +169,15 @@ $.couch.app(function(app) {
     var views=[];
     var iosresults=[];
     var deltavresult=[];
+    var respheader=[];
     for (var i=0; i<recents.length; i++){
+//      dat=$.getJSON(path+datadb+recents[i]+options);
+//      gethead=dat.getAllResponseHeaders();
       views.push(
         $.getJSON(path+datadb+recents[i]+options,function(result){
           //collects the results but in whatever order they arrive
           iosresults.push(result.rows[0].value);
+          respheader.push(result.getAllResponseHeaders();
         })
       ); 
     }
