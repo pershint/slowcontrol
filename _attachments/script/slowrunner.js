@@ -275,12 +275,12 @@ $.couch.app(function(app) {
           $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"red"});
           // If any racks are off, set their channel reading color to gray
           if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
-            if (channelInfo.reason="off"){
+            if (channelInfo.reason=="off"){
               $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"gray"});
             }
           }
           if (channelInfo.type=="timing rack" || channelInfo.type=="MTCD"){
-            if (channelInfo.reason="off"){
+            if (channelInfo.reason=="off"){
               $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"gray"});
             }
           }
