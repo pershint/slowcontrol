@@ -306,7 +306,7 @@ $.couch.app(function(app) {
     $("#alarmlist").empty();
       //First, check the detector server connection
       if (alarms.detserver[0].connStatus == "NONE") {
-        $("#DetServerConn").css({"background-color":"red"});
+        $("#DetectorServer").css({"background-color":"red"});
       }
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
