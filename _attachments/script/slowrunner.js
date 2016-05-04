@@ -304,6 +304,10 @@ $.couch.app(function(app) {
       }
     }
     $("#alarmlist").empty();
+      //First, check the detector server connection
+      if (alarms.detserver[0].connStatus == "NONE") {
+        $("#DetServerConn").css({"background-color":"red"});
+      }
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
@@ -480,6 +484,9 @@ $.couch.app(function(app) {
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       arrangedAlarms.ioss.push({"cards":[],"ios":sizes.ioss[ios].ios});
+      if (hardToReadAlarms[ios].DetectorServer_Conn !== undefined ) {
+        arrangedAlarms.detserver.push({"connStatus":hardToReadAlarms[ios].DetectorServer_Conn});
+      }
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         arrangedAlarms.ioss[ios].cards[card]={
           "channels":hardToReadAlarms[ios][sizes.ioss[ios].cards[card].card],
