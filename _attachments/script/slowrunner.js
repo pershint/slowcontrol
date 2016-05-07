@@ -121,6 +121,9 @@ $.couch.app(function(app) {
         deltavChannel=0;
       }
       $("#present_deltav"+channel).text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      if (newChannelType == "cavity_water_temp"){
+        $("#cavity_water_temp1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      }
       deltavChannel++;
     }
 
@@ -131,6 +134,15 @@ $.couch.app(function(app) {
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           $("#present_ios"+ios+"card"+card+"channel"+channel).text(
           Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*10000)/10000);
+          //Write rack voltages into overview page
+          //The Idea: look at the information for this channel from the channeldb.  If it's a rack, fill it's
+          //Voltage information into the correct box on the webpage.
+          channelType=sizes.ioss[ios].cards[card].channels[channel].type;
+          channelSignal=sizes.ioss[ios].cards[card].channels[channel].signal;
+          channelid=sizes.ioss[ios].cards[card].channels[channel].id;
+          if (channelType == "rack"  || channelType == "timing rack"){
+            $("#rack"+channelid+"channel"+channelSignal+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*100)/100);
+          }
         }
         cardCount++;
       }

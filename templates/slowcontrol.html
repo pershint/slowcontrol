@@ -90,7 +90,7 @@
           {{id}}
           {{#channels}}
           <div id="rack{{id}}channel{{channel}}" class="box inside">
-            {{channel}}
+            {{channel}} <span id="rack{{id}}channel{{channel}}val"></span>
           </div>
           {{/channels}}
         </div>
@@ -127,7 +127,7 @@
           <div id="otherMine" class="box big" style="clear:both">Mine Power</div>
         </div>
 	<div class="big">
-          <div id="cavity_water_temp1" class="box big" style="clear:both">Cavity Water Temp</div>
+          <div id="cavity_water_temp1" class="box big" style="clear:both">Cavity Water Temp: <span id="cavity_water_temp1val"></span></div>
         </div>
 	<div class="big">
           <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level</div>
