@@ -140,8 +140,14 @@ $.couch.app(function(app) {
           channelType=sizes.ioss[ios].cards[card].channels[channel].type;
           channelSignal=sizes.ioss[ios].cards[card].channels[channel].signal;
           channelid=sizes.ioss[ios].cards[card].channels[channel].id;
-          if (channelType == "rack"  || channelType == "timing rack"){
+          if (channelType == "rack"){
             $("#rack"+channelid+"channel"+channelSignal+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*100)/100);
+          }
+          if (channelType =="timing rack"){
+            $("#rackTimingchannel"+channelSignal+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*100)/100);
+          }
+          if (channelType == "MTCD"){
+            $("#"+channelType+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*1000)/1000);
           }
         }
         cardCount++;
