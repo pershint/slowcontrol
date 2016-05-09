@@ -263,16 +263,9 @@ $.couch.app(function(app) {
               $("#coils").css({"background-color":"goldenrod"});
               $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
-            if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic"){
-              $("#otherE-Stop").css({"background-color":"golenrod"});
+            if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic" || sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
+              $("#EStopUPS").css({"background-color":"golenrod"});
             }
-            if (sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
-              $("#otherMine").css({"background-color":"goldenrod"});
-            }
-	    if (sizes.ioss[ios].cards[card].channels[channel].type=="MTCD"){
-              $("#otherMTCD").css({"background-color":"goldenrod"});
-            }
-
           }
         }
       }
@@ -372,8 +365,8 @@ $.couch.app(function(app) {
             $("#coils").css({"background-color":"red"});
             $("#coil"+channelInfo.id+"channel"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
           }
-          if (channelInfo.type=="HV Panic"){
-            $("#otherE-Stop").css({"background-color":"red"});
+          if (channelInfo.type=="HV Panic" || channelInfo.type=="UPS"){
+            $("#EStopUPS").css({"background-color":"red"});
           }
           if (channelInfo.type=="UPS"){
             $("#otherMine").css({"background-color":"red"});
