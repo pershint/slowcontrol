@@ -12,7 +12,8 @@ function(doc, req) {
     "other":[],
     "equator":[],
     "AVtemp":[],
-    "cavitywaterlevel":[]
+    "cavitywaterlevel":[],
+    "conns":[]
   };
   
   var channels = {
@@ -26,7 +27,7 @@ function(doc, req) {
       ],
       "ids":[1,2,3,4,5,6,7,8,9,10,11,"Timing"],
       "styles":[
-        "two","two","one","two","two","two","one","two","two","one","two","one"
+        "three","three","three","three","three","three","three","three","three","three","three","three"
       ]
     },
     "crates":{
@@ -83,6 +84,11 @@ function(doc, req) {
       "channels":[""],
       "ids":[1,2,3,4],
       "styles":["one","one","one","one"]
+    },
+    "conns":{
+      "channels":[""],
+      "ids":["DetectorServer"],
+      "styles":["one"]
     }
   };
 
@@ -158,6 +164,12 @@ function(doc, req) {
     };
   }
 
+  for (var index=0; index<channels.conns.ids.length; index++){
+    data.conns[index]={
+      "id":channels.conns.ids[index],
+      "style":channels.conns.styles[index],
+    };
+  }
   for (var index=0; index<channels.other.ids.length; index++){
     data.other[index]={
       "id":channels.other.ids[index],

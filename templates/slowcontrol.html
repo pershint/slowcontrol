@@ -90,7 +90,7 @@
           {{id}}
           {{#channels}}
           <div id="rack{{id}}channel{{channel}}" class="box inside">
-            {{channel}}
+            {{channel}}: <span id="rack{{id}}channel{{channel}}val"></span>
           </div>
           {{/channels}}
         </div>
@@ -118,16 +118,13 @@
           Others
         </div>
 	<div class="big">
-          <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V</div>
+          <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V: <scan id=MTCDval></scan></div>
         </div>
 	<div class="big">
-          <div id="otherE-Stop" class="box big" style="clear:both">E-Stop/HV Disable</div>
-        </div>
-        <div class="big">
-          <div id="otherMine" class="box big" style="clear:both">Mine Power</div>
+          <div id="EStopUPS" class="box big" style="clear:both">E-Stop/HV Disable or UPS</div>
         </div>
 	<div class="big">
-          <div id="cavity_water_temp1" class="box big" style="clear:both">Cavity Water Temp</div>
+          <div id="cavity_water_temp1" class="box big" style="clear:both">Cavity Water Temp: <span id="cavity_water_temp1val"></span></div>
         </div>
 	<div class="big">
           <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level</div>
@@ -193,7 +190,20 @@
         </div>
         {{/equator}}
       </div>
-      
+
+      <div style="width:200%;height:50px">
+        <div>
+          Connection Statuses
+        </div>
+        {{#conns}}
+        <div class="{{style}}">
+          <div id="{{id}}" class="box inside">
+            {{id}}
+          </div>
+        </div>
+        {{/conns}}
+      </div>
+     
       <div style="width:100%;height:175px">
         <div>
           Page updates (Current UTC minus latest document timestamp)

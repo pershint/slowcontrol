@@ -121,6 +121,9 @@ $.couch.app(function(app) {
         deltavChannel=0;
       }
       $("#present_deltav"+channel).text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      if (newChannelType == "cavity_water_temp"){
+        $("#cavity_water_temp1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      }
       deltavChannel++;
     }
 
@@ -131,6 +134,21 @@ $.couch.app(function(app) {
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           $("#present_ios"+ios+"card"+card+"channel"+channel).text(
           Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*10000)/10000);
+          //Write rack voltages into overview page
+          //The Idea: look at the information for this channel from the channeldb.  If it's a rack, fill it's
+          //Voltage information into the correct box on the webpage.
+          channelType=sizes.ioss[ios].cards[card].channels[channel].type;
+          channelSignal=sizes.ioss[ios].cards[card].channels[channel].signal;
+          channelid=sizes.ioss[ios].cards[card].channels[channel].id;
+          if (channelType == "rack"){
+            $("#rack"+channelid+"channel"+channelSignal+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*100)/100);
+          }
+          if (channelType =="timing rack"){
+            $("#rackTimingchannel"+channelSignal+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*100)/100);
+          }
+          if (channelType == "MTCD"){
+            $("#"+channelType+"val").text(Math.round(parseFloat(presentValues.ioss[ios][sizes.ioss[ios].cards[card].card]["voltages"][channel])*1000)/1000);
+          }
         }
         cardCount++;
       }
@@ -250,16 +268,9 @@ $.couch.app(function(app) {
               $("#coils").css({"background-color":"goldenrod"});
               $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
-            if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic"){
-              $("#otherE-Stop").css({"background-color":"golenrod"});
+            if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic" || sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
+              $("#EStopUPS").css({"background-color":"golenrod"});
             }
-            if (sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
-              $("#otherMine").css({"background-color":"goldenrod"});
-            }
-	    if (sizes.ioss[ios].cards[card].channels[channel].type=="MTCD"){
-              $("#otherMTCD").css({"background-color":"goldenrod"});
-            }
-
           }
         }
       }
@@ -280,12 +291,12 @@ $.couch.app(function(app) {
           $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"red"});
           // If any racks are off, set their channel reading color to gray
           if (channelInfo.type=="rack" || channelInfo.type=="rack voltage"){
-            if (channelInfo.reason="off"){
+            if (channelInfo.reason=="off"){
               $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"gray"});
             }
           }
           if (channelInfo.type=="timing rack" || channelInfo.type=="MTCD"){
-            if (channelInfo.reason="off"){
+            if (channelInfo.reason=="off"){
               $("#present_ios"+ios+"card"+card+"channel"+alarms.ioss[ios].cards[card].channels[channel].channel).css({"color":"gray"});
             }
           }
@@ -309,6 +320,10 @@ $.couch.app(function(app) {
       }
     }
     $("#alarmlist").empty();
+      //First, check the detector server connection
+      if (alarms.detserver[0].connStatus == "NONE") {
+        $("#DetectorServer").css({"background-color":"red"});
+      }
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
@@ -355,8 +370,8 @@ $.couch.app(function(app) {
             $("#coils").css({"background-color":"red"});
             $("#coil"+channelInfo.id+"channel"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
           }
-          if (channelInfo.type=="HV Panic"){
-            $("#otherE-Stop").css({"background-color":"red"});
+          if (channelInfo.type=="HV Panic" || channelInfo.type=="UPS"){
+            $("#EStopUPS").css({"background-color":"red"});
           }
           if (channelInfo.type=="UPS"){
             $("#otherMine").css({"background-color":"red"});
@@ -480,10 +495,14 @@ $.couch.app(function(app) {
   var arrangeAlarmsLikeChanneldb = function(hardToReadAlarms){
     var arrangedAlarms={
       "ioss":[],
-      "deltav":[]
+      "deltav":[],
+      "detserver":[]
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       arrangedAlarms.ioss.push({"cards":[],"ios":sizes.ioss[ios].ios});
+      if (hardToReadAlarms[ios].DetectorServer_Conn !== undefined ) {
+        arrangedAlarms.detserver.push({"connStatus":hardToReadAlarms[ios].DetectorServer_Conn});
+      }
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         arrangedAlarms.ioss[ios].cards[card]={
           "channels":hardToReadAlarms[ios][sizes.ioss[ios].cards[card].card],

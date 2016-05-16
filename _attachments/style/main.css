@@ -36,8 +36,8 @@ border:1px solid #000;
 float:left;
 }
 .big{
-width:100px;
-height:51px;
+width:125px;
+height:60px;
 float:left;
 text-align:center;
 }
@@ -62,6 +62,12 @@ text-align:center;
 }
 .two{
 width:10%;
+height:25px;
+float:left;
+text-align:center;
+}
+.three{
+width:8.333%;
 height:25px;
 float:left;
 text-align:center;
