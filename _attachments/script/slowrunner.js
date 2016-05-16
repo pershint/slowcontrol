@@ -641,6 +641,7 @@ $.couch.app(function(app) {
     filledThresholdData.timestamp = presentData.ioss[0].timestamp
     filledThresholdData.sudbury_time = presentData.ioss[0].sudbury_time
     filledThresholdData.submitter = $("#name-text").val()
+    filledThresholdData.reason = $("#reason-text").val()
     filledThresholdData.approved = $("#approved").prop("checked");    
     $("#statustext").text("Saving..");
     $.getJSON(path+"/_uuids?count=1", function(result){
