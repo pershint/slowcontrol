@@ -115,6 +115,7 @@ $.couch.app(function(app) {
     var oldChannelType="";
     var newChannelType="";
     $("#time_data_deltav").text(Math.round(Date.now()/1000)-presentValues.deltav.timestamp);
+//    $("#time_data_deltav").text(presentValues.header.date - presentValues.ioss[ios].timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
       if (newChannelType != oldChannelType){
@@ -130,6 +131,7 @@ $.couch.app(function(app) {
     var cardCount;
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       $("#time_data_ios"+(ios+1)).text(Math.round(Date.now()/1000)-presentValues.ioss[ios].timestamp);
+//    $("#time_data_ios"+(ios+1)).text(Math.round(presentValues.header.date - presentValues.ioss[ios].timestamp);
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           $("#present_ios"+ios+"card"+card+"channel"+channel).text(
