@@ -280,7 +280,7 @@ $.couch.app(function(app) {
         $("#present_deltav"+channel).css({"color":"goldenrod"});
         $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"goldenrod"});
 //          $("#holdups").css({"background-color":""goldenrod"});
-     }
+      }
     }
 
 // Set anything with an alarm to red
@@ -304,6 +304,7 @@ $.couch.app(function(app) {
         }
       }
     }
+
     var numDeltavChannels = sizes.deltav.length;
     var channelid="";
     for (var field in alarms.deltav){
@@ -412,7 +413,54 @@ $.couch.app(function(app) {
         }
       }
     }
-//    $("#statustext").text("Done.");
+
+    //Finally, if any timestamps on ioses or deltaV are too old, turn enabled boxes cyan
+    for (var ios=0; ios<sizes.ioss.length-1; ios++){
+      if (Number($("#time_data_ios"+(ios+1)).text()) > 35){
+        for (var card=0; card<sizes.ioss[ios].cards.length; card++){
+          for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
+            if (sizes.ioss[ios].cards[card].channels[channel].isEnabled!==0){
+              $("#present_ios"+ios+"card"+card+"channel"+channel).css({"color":"cyan"});
+              if (sizes.ioss[ios].cards[card].channels[channel].type=="xl3"){
+                $("#xl3s").css({"background-color":"cyan"});
+                $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channelXL3_"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"cyan"});
+              }
+             if (sizes.ioss[ios].cards[card].channels[channel].type=="rack"){
+                $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id)
+                .css({"background-color":"cyan"});
+                $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"cyan"});
+              }
+              if (sizes.ioss[ios].cards[card].channels[channel].type=="timing rack"){
+                $("#timing").css({"background-color":"cyan"});
+                $("#rackTimingchannel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"cyan"});
+              }
+              if (sizes.ioss[ios].cards[card].channels[channel].type=="crate"){
+                $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id)
+                .css({"background-color":"cyan"});
+                $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"cyan"});
+              }
+             if (sizes.ioss[ios].cards[card].channels[channel].type=="Comp Coil"){
+                $("#coils").css({"background-color":"cyan"});
+                $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"cyan"});
+              }
+              if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic" || sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
+                $("#EStopUPS").css({"background-color":"cyan"});
+              }
+            }
+          }
+        }
+      }
+    }
+    for (var channel=0; channel<sizes.deltav.length; channel++){
+      if(Number($("#time_data_deltav").text()) > 450){
+        if (sizes.deltav[channel].isEnabled!==0){
+          $("#present_deltav"+channel).css({"color":"cyan"});
+          $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"cyan"});
+//          $("#holdups").css({"background-color":""goldenrod"});
+        }
+      }
+    }
+
   }
 
   var EmergencyRackShutdownCheck=function(){
