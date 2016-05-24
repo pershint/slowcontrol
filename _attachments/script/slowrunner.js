@@ -158,7 +158,7 @@ $.couch.app(function(app) {
   var retrievePresentThresholds = function(fill){
     $("#statustext").text("Getting Thresholds...");
     retrieveSizes(function(){
-      $("#statustext").text("Done loading thresholds. These thesholds were set by "+sizes.submitter+" in "+sizes.ip_address.city+" from computer "+sizes.ip_address.ip+" on "+sizes.sudbury_time);
+      $("#statustext").text("Done loading thresholds. These thesholds were set by "+sizes.submitter+" in "+sizes.ip_address.city+" from computer "+sizes.ip_address.ip+" on "+sizes.sudbury_time+". Reason for last change: "+sizes.reason);
       if (fill==null){
         fillThresholds(sizes);
       }
@@ -650,7 +650,7 @@ $.couch.app(function(app) {
       delete filledThresholdData._rev;
       app.db.saveDoc(filledThresholdData, {
         success : function(resp) {
-          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val());
+          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val()+" for reason: "+$("#reason-text").val());
           formatAll(alarms);
           alert("Save successful");
 	  $("#popupSave").popup("close");  
