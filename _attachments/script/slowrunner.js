@@ -160,7 +160,7 @@ $.couch.app(function(app) {
   var retrievePresentThresholds = function(fill){
     $("#statustext").text("Getting Thresholds...");
     retrieveSizes(function(){
-      $("#statustext").text("Done loading thresholds. These thesholds were set by "+sizes.submitter+" in "+sizes.ip_address.city+" from computer "+sizes.ip_address.ip+" on "+sizes.sudbury_time);
+      $("#statustext").text("Done loading thresholds. These thesholds were set by "+sizes.submitter+" in "+sizes.ip_address.city+" from computer "+sizes.ip_address.ip+" on "+sizes.sudbury_time+". Reason for last change: "+sizes.reason);
       if (fill==null){
         fillThresholds(sizes);
       }
@@ -325,6 +325,9 @@ $.couch.app(function(app) {
       //First, check the detector server connection
       if (alarms.detserver[0].connStatus == "NONE") {
         $("#DetectorServer").css({"background-color":"red"});
+      }
+      if (alarms.iboot3[0].iboot3pwr == "OFF") {
+        $("#IBoot3").css({"background-color":"gray"});
       }
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
@@ -498,12 +501,16 @@ $.couch.app(function(app) {
     var arrangedAlarms={
       "ioss":[],
       "deltav":[],
-      "detserver":[]
+      "detserver":[],
+      "iboot3":[]
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       arrangedAlarms.ioss.push({"cards":[],"ios":sizes.ioss[ios].ios});
       if (hardToReadAlarms[ios].DetectorServer_Conn !== undefined ) {
         arrangedAlarms.detserver.push({"connStatus":hardToReadAlarms[ios].DetectorServer_Conn});
+      }
+      if (hardToReadAlarms[ios].IBoot3Power !== undefined ) {
+        arrangedAlarms.iboot3.push({"iboot3pwr":hardToReadAlarms[ios].IBoot3Power});
       }
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         arrangedAlarms.ioss[ios].cards[card]={
@@ -648,6 +655,7 @@ $.couch.app(function(app) {
     filledThresholdData.timestamp = presentData.ioss[0].timestamp
     filledThresholdData.sudbury_time = presentData.ioss[0].sudbury_time
     filledThresholdData.submitter = $("#name-text").val()
+    filledThresholdData.reason = $("#reason-text").val()
     filledThresholdData.approved = $("#approved").prop("checked");    
     $("#statustext").text("Saving..");
     $.getJSON(path+"/_uuids?count=1", function(result){
@@ -656,7 +664,7 @@ $.couch.app(function(app) {
       delete filledThresholdData._rev;
       app.db.saveDoc(filledThresholdData, {
         success : function(resp) {
-          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val());
+          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val()+" for reason: "+$("#reason-text").val());
           formatAll(alarms);
           alert("Save successful");
 	  $("#popupSave").popup("close");  

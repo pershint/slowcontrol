@@ -87,8 +87,8 @@ function(doc, req) {
     },
     "conns":{
       "channels":[""],
-      "ids":["DetectorServer"],
-      "styles":["one"]
+      "ids":["DetectorServer", "IBoot3"],
+      "styles":["one","one"]
     }
   };
 
