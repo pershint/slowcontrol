@@ -114,7 +114,6 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
-//    $("#time_data_deltav").text(Math.round(Date.now()/1000)-presentValues.deltav.timestamp);
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
@@ -130,7 +129,6 @@ $.couch.app(function(app) {
 
     var cardCount;
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
-//      $("#time_data_ios"+(ios+1)).text(Math.round(Date.now()/1000)-presentValues.ioss[ios].timestamp);
       $("#time_data_ios"+(ios+1)).text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.ioss[ios].timestamp);
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
@@ -191,7 +189,7 @@ $.couch.app(function(app) {
     var deltavresult=[];
     var responsetime="";
     for (var i=0; i<recents.length; i++){
-     views.push(
+      views.push(
         $.getJSON(path+datadb+recents[i]+options,function(result){
           //collects the results but in whatever order they arrive
           iosresults.push(result.rows[0].value);
