@@ -114,8 +114,8 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
-    $("#time_data_deltav").text(Math.round(Date.now()/1000)-presentValues.deltav.timestamp);
-//    $("#time_data_deltav").text(presentValues.header.date - presentValues.ioss[ios].timestamp);
+//    $("#time_data_deltav").text(Math.round(Date.now()/1000)-presentValues.deltav.timestamp);
+    $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
       if (newChannelType != oldChannelType){
@@ -130,8 +130,8 @@ $.couch.app(function(app) {
 
     var cardCount;
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
-      $("#time_data_ios"+(ios+1)).text(Math.round(Date.now()/1000)-presentValues.ioss[ios].timestamp);
-//    $("#time_data_ios"+(ios+1)).text(Math.round(presentValues.header.date - presentValues.ioss[ios].timestamp);
+//      $("#time_data_ios"+(ios+1)).text(Math.round(Date.now()/1000)-presentValues.ioss[ios].timestamp);
+      $("#time_data_ios"+(ios+1)).text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.ioss[ios].timestamp);
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           $("#present_ios"+ios+"card"+card+"channel"+channel).text(
@@ -189,11 +189,9 @@ $.couch.app(function(app) {
     var views=[];
     var iosresults=[];
     var deltavresult=[];
-    var respheader=[];
+    var responsetime="";
     for (var i=0; i<recents.length; i++){
-      dat=$.getJSON(path+datadb+recents[i]+options);
-      respheader.push(dat.getAllResponseHeaders());
-      views.push(
+     views.push(
         $.getJSON(path+datadb+recents[i]+options,function(result){
           //collects the results but in whatever order they arrive
           iosresults.push(result.rows[0].value);
@@ -201,9 +199,11 @@ $.couch.app(function(app) {
         })
       ); 
     }
+    //Grab the data as well as the response header date from CouchDB
     views.push(
-      $.getJSON(path+onemindb+deltav+options,function(result){
+      $.getJSON(path+onemindb+deltav+options,function(result, txtstatus, jqobj){
         deltavresult=result.rows[0].value;
+        responsetime = jqobj.getResponseHeader("Date");
       })
     );
 
@@ -214,7 +214,7 @@ $.couch.app(function(app) {
       presentData={
         "ioss":[],
         "deltav":deltavresult,
-        "header":respheader
+        "couchDBtime":responsetime
       };
       for (var i=0; i<iosresults.length; i++){
         resultpos=$.grep(iosresults, function(e,f){return e.ios == i+1;});
