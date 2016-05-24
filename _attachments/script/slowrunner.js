@@ -319,6 +319,9 @@ $.couch.app(function(app) {
       if (alarms.detserver[0].connStatus == "NONE") {
         $("#DetectorServer").css({"background-color":"red"});
       }
+      if (alarms.iboot3[0].iboot3pwr == "OFF") {
+        $("#IBoot3").css({"background-color":"gray"});
+      }
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
@@ -491,12 +494,16 @@ $.couch.app(function(app) {
     var arrangedAlarms={
       "ioss":[],
       "deltav":[],
-      "detserver":[]
+      "detserver":[],
+      "iboot3":[]
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       arrangedAlarms.ioss.push({"cards":[],"ios":sizes.ioss[ios].ios});
       if (hardToReadAlarms[ios].DetectorServer_Conn !== undefined ) {
         arrangedAlarms.detserver.push({"connStatus":hardToReadAlarms[ios].DetectorServer_Conn});
+      }
+      if (hardToReadAlarms[ios].IBoot3Power !== undefined ) {
+        arrangedAlarms.iboot3.push({"iboot3pwr":hardToReadAlarms[ios].IBoot3Power});
       }
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         arrangedAlarms.ioss[ios].cards[card]={
