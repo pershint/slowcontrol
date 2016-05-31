@@ -219,6 +219,7 @@ $.couch.app(function(app) {
         presentData.ioss.push(resultpos[0]);
       }
       fillValues(presentData);
+      formatAll();
     });
   };
 
@@ -533,7 +534,6 @@ $.couch.app(function(app) {
       hardToReadAlarms.deltav=deltavresult;
       alarms=arrangeAlarmsLikeChanneldb(hardToReadAlarms);
       $("#rackaudio").get(0).pause();
-      formatAll();
       //EmergencyRackShutdownCheck();
       $("#time_alarm_deltav").text(Math.round(Date.now()/1000)-alarms.deltav.timestamp);
       for (var ios=0; ios<sizes.ioss.length-1; ios++){
@@ -711,7 +711,9 @@ $.couch.app(function(app) {
       app.db.saveDoc(filledThresholdData, {
         success : function(resp) {
           $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val()+" for reason: "+$("#reason-text").val());
-          formatAll(alarms);
+          //formatAll(alarms);    //originally like this; but formatAll
+                                  //doesn't take an argument...
+          formatAll();
           alert("Save successful");
 	  $("#popupSave").popup("close");  
         },
