@@ -27,7 +27,7 @@ $.couch.app(function(app) {
     
 
     var getData = function(){
-	$("#graphstatus").text("Loading Data...Please wait.");
+	$("#graphstatus").text("Loading data, please wait...");
 	var views=[];
 	var ios5secresults=[];
 	var ios1minresults=[];
@@ -270,8 +270,9 @@ $.couch.app(function(app) {
 							 
 
 /*  Here begins the stuff that runs when the page loads  */
+  $("#graphingdate").text("Right now ");
 
-    $("#deleteplot").click(function(){
+  $("#deleteplot").click(function(){
 	var selected=$("#name_dropdown :selected").val();
 	$("."+selected+"chart").css({"display":"none"});
 //	$("#graphstatus").text(JSON.stringify(easyToReadData));

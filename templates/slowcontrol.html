@@ -376,7 +376,7 @@
       <select id="name_dropdown" data-inline="true" width="200px"></select>
       <button id="addplot" class="ui-btn ui-btn-inline ui-icon-plus ui-btn-icon-right">Add</button>
       <button id="deleteplot" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-right">Delete</button>
-      <div class="ui-field-contain">
+      <div class="ui-field-contain" id="plotDate">
 	<legend>Choose a time to plot from (Default is now):</legend>
 	<select name="plotYear" id="plotYear" data-inline="true" data-native-menu="false">
 	  <option>Year</option>
@@ -400,10 +400,14 @@
 	  <option value="Nov">November</option>
 	  <option value="Dec">December</option>
         </select>
-	<input class="smtextbox" name="plotDay" id="plotDay" placeholder="Day #" value="">
-        <input class="smtextbox" name="plotHour" id="plotHour" placeholder="24-hour #" value="">
+	<input name="plotDay" id="plotDay" placeholder="Day #" value="">
+        <input name="plotHour" id="plotHour" placeholder="24-hour #" value="">
+        <button id="setPlotDate" class="ui-btn ui-btn-inline ui-icon-plus ui-btn-icon-right">Apply</button>
         </legend>	
     </div>
+    <label for="graphingdate">Currently graphing back from time:</label>
+    <div id="graphingdate"></div>
+    <p>
     <div id="graphstatus"></div>
     <div id="plots"></div>
     </div>
