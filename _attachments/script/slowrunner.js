@@ -219,7 +219,7 @@ $.couch.app(function(app) {
         presentData.ioss.push(resultpos[0]);
       }
       fillValues(presentData);
-      formatAll();
+      //formatAll();
     });
   };
 
@@ -806,6 +806,7 @@ $.couch.app(function(app) {
     poll(polling);
     retrievePresentThresholds(true);
     waitCheck(checking);
+    formatAll();
   });
 //while(true){
 //  setTimeout(function(){},5000);
