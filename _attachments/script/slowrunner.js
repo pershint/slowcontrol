@@ -416,6 +416,11 @@ $.couch.app(function(app) {
     }
 
     //Finally, if any timestamps on ioses or deltaV are too old, turn enabled boxes cyan
+    if (Number($("#time_data_ios2").text()) > 35){
+        $("#DetectorServer").css({"background-color":"cyan"});
+        $("#IBoot3").css({"background-color":"cyan"});
+    }
+
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       if (Number($("#time_data_ios"+(ios+1)).text()) > 35){
         for (var card=0; card<sizes.ioss[ios].cards.length; card++){
