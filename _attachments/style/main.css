@@ -20,6 +20,14 @@ position:relative;
 height:400px;
 min-width:310px;
 }
+
+/*Need !importants to override default*/
+.smtextbox input[type="text"]{
+width:10px !important;
+height:30px !important;
+}
+
+
 .box{
 /*background-color:green;*/
 border:1px solid #000;
