@@ -416,6 +416,7 @@ $.couch.app(function(app) {
     }
 
     //Finally, if any timestamps on ioses or deltaV are too old, turn enabled boxes cyan
+    //Number(($"#time_data_ios").text()) are 0 when $"#time_data_ios" has no value
     if (Number($("#time_data_ios2").text()) > 35){
         $("#DetectorServer").css({"background-color":"cyan"});
         $("#IBoot3").css({"background-color":"cyan"});
@@ -803,6 +804,7 @@ $.couch.app(function(app) {
   });
 */
   retrieveSizes(function(){
+    setAlarms();
     retrievePresentValues();
     poll(polling);
     retrievePresentThresholds(true);
