@@ -219,7 +219,7 @@ $.couch.app(function(app) {
         presentData.ioss.push(resultpos[0]);
       }
       fillValues(presentData);
-      //formatAll();
+      formatAll();
     });
   };
 
@@ -534,6 +534,7 @@ $.couch.app(function(app) {
       }
       hardToReadAlarms.deltav=deltavresult;
       alarms=arrangeAlarmsLikeChanneldb(hardToReadAlarms);
+      formatAll();
       $("#rackaudio").get(0).pause();
       //EmergencyRackShutdownCheck();
       $("#time_alarm_deltav").text(Math.round(Date.now()/1000)-alarms.deltav.timestamp);
@@ -806,7 +807,6 @@ $.couch.app(function(app) {
     poll(polling);
     retrievePresentThresholds(true);
     waitCheck(checking);
-    formatAll();
   });
 //while(true){
 //  setTimeout(function(){},5000);
