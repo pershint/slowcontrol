@@ -24,7 +24,6 @@ $.couch.app(function(app) {
 	    }
 	});
     };
-    
 
     var getData = function(){
 	$("#graphstatus").text("Loading data, please wait...");
@@ -122,51 +121,7 @@ $.couch.app(function(app) {
 		}
 	    }
 	}
-	/*		for (var ios=0; ios<sizes.ioss.length-1; ios++){
-	    arrangedData.ioss[ios]={"cards":[],"ios":sizes.ioss[ios].ios};
-	    for (var card=0; card<sizes.ioss[ios].cards.length; card++){
-		cardName=sizes.ioss[ios].cards[card].card
-		arrangedData.ioss[ios].cards[card]={
-		    "channels":[],
-		    "card":cardName
-		};
-		for (channel=0; channel<hardToReadData.ioss[ios][0].value[cardName].voltages.length; channel++){
-		    arrangedData.ioss[ios].cards[card].channels[channel]={
-			"data":[]
-		    };
-		}
-		for (var row=0; row<hardToReadData.ioss[ios].length; row++){
-		    for (channel=0; channel<arrangedData.ioss[ios].cards[card].channels.length; channel++){
-			arrangedData.ioss[ios].cards[card].channels[channel].data[row]=[hardToReadData.ioss[ios][row].key*1000,hardToReadData.ioss[ios][row].value[cardName].voltages[channel]];
-		    }
-		}
-	    }
-	}
-	for (var ios=0; ios<sizes.ioss.length-1; ios++){
-	    arrangedData.iosOnemin[ios]={"cards":[],"ios":sizes.ioss[ios].ios};
-	    for (var card=0; card<sizes.ioss[ios].cards.length; card++){
-		cardName=sizes.ioss[ios].cards[card].card
-		arrangedData.iosOnemin[ios].cards[card]={
-		    "channels":[],
-		    "card":cardName
-		};
-		for (channel=0; channel<hardToReadData.iosOnemin[ios][0].value[cardName].average.length; channel++){
-		    arrangedData.iosOnemin[ios].cards[card].channels[channel]={
-			"data":[]
-		    };
-		}
-		for (var row=0; row<hardToReadData.iosOnemin[ios].length; row++){
-		    for (channel=0; channel<arrangedData.iosOnemin[ios].cards[card].channels.length; channel++){
-			try {
-			    arrangedData.iosOnemin[ios].cards[card].channels[channel].data[row]=[hardToReadData.iosOnemin[ios][row].key*1000,hardToReadData.iosOnemin[ios][row].value[cardName].average[channel]];
-			} catch(err) {
-			    //alert(JSON.stringify(hardToReadData.iosOnemin[ios][row]));
-			    arrangedData.iosOnemin[ios].cards[card].channels[channel].data[row]=[hardToReadData.iosOnemin[ios][row].key*1000,0];
-			}
-		    }
-		}
-	    }
-	}*/
+
 	for (var channel=0; channel<sizes.deltav.length; channel++){
 	    arrangedData.deltav[channel]={"data":[]};
 	    cleanedtype=sizes.deltav[channel].type;
@@ -267,7 +222,18 @@ $.couch.app(function(app) {
         }]
     });
   };
-							 
+
+                       //NOTES: So, in the .getJSON function, the options variable has the limit=1
+                       //in it.  So, This is why only one row is pulled from the database and updated
+                       //to the plot on the master plot every five seconds.  So, we need to make a similar
+                       //function to this to pull the 1000 data points from the date input by the user
+                       //and just plot that, then don't do any updating of the series being plotted.
+                       //BIG ISSUE RIGHT NOW: This function only APPENDS data points onto the current
+                       //easyToReadData object, which has the most recent 1000 points in the DB.  
+                       //Basically, I think I should also write a whole new data collection function that pulls
+                       //1000 points from whatever timestamp is defined in plots.js.  Then, we just make
+                       //a plot of those 1000 points if the graphingdate is not "Right Now".
+ 						 
 
 /*  Here begins the stuff that runs when the page loads  */
   $("#graphingdate").text("Right now");
@@ -327,11 +293,8 @@ $.couch.app(function(app) {
 //  Clear voltages and make names in the callback 
     var nameindex=0;
     for (var ios = 0; ios<sizes.ioss.length-1; ios++){
-//      voltages.ioss.push({"cards":[]});
       for (var card = 0; card<sizes.ioss[ios].cards.length; card++){
-//        voltages.ioss[ios].cards.push({"channels":[]});
         for (var channel = 0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
-//          voltages.ioss[ios].cards[card].channels.push({});
           nameText="";
           if(sizes.ioss[ios].cards[card].channels[channel].type){
             nameText += " "+sizes.ioss[ios].cards[card].channels[channel].type;
