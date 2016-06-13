@@ -277,7 +277,7 @@ $.couch.app(function(app) {
   });
 
   $("#setPlotDate").click(function(){
-    if($("#plotYear").val() == "Year" || $("plotMonth").val() == "Month" || $("#plotDay").val() == "" || $("#plotHour").val() == "" || parseInt($("#plotHour").val()) < 1 || parseInt($("#plotHour").val()) > 24 || parseInt($("#plotDay").val()) < 1 ){
+    if($("#plotYear").val() == "Year" || $("plotMonth").val() == "Month" || $("#plotDay").val() == "" || $("#plotHour").val() == "" || parseInt($("#plotHour").val()) < 1 || parseInt($("#plotHour").val()) > 24 || parseInt($("#plotDay").val()) < 1 || parseInt($("#plotDay").val()) > 31 ){
       window.alert("Input date invalid; please choose a valid time to plot from.");
     }
     else if( (($.inArray($("#plotMonth").val(), ["Sep","Apr","Jun","Nov"]) > 0) && parseInt($("#plotDay").val()) > 30) || ($("#plotMonth").val() == "Feb" && parseInt($("#plotDay").val()) > 29)){
