@@ -1,11 +1,15 @@
 $.couch.app(function(app) {
     var charts=[];
     var names=[];
+    var hTRDataDated=[];
+    var eTRDataDated=[];
     var hardToReadData=[];
     var easyToReadData=[];
     var detailVoltages = [];
     var channelparameter = [];
 
+    var graphdate = "Right Now";
+    var graphdateold = "Right Now";
     var path="";
     var channeldb="/slowcontrol-channeldb/_design/slowcontrol/_view/recent";
     var fivesecdb="/slowcontrol-data-5sec/_design/slowcontrol-data-5sec";
@@ -25,6 +29,8 @@ $.couch.app(function(app) {
 	});
     };
 
+    //Function: Grabs the 1000 most recent documents from the IOSes and
+    //DeltaV and puts them in the easyToReadData object. 
     var getData = function(){
 	$("#graphstatus").text("Loading data, please wait...");
 	var views=[];
@@ -76,15 +82,101 @@ $.couch.app(function(app) {
 		    hardToReadData.iosFifteenmin[i]=resultpos[0];
 		}
 		hardToReadData.deltav=deltavresult;
-		makeDataEasyToRead(hardToReadData);
-		$("#graphstatus").text("Ready to make plots!");
+		makeDataEasyToRead(hardToReadData, false);
+		$("#graphstatus").text("Ready to make live plots!");
 		$("#addplot").removeAttr("disabled");
 		return true;
 	    });
     };
+
+    //FIXME: Here's where the current bug is.  Doesn't seem to like the startkey, endkey, etc.
+    //but using starttimestamp and endtimestamp gets data, just the wrong thing.  Not sure what
+    //the issue is yet.
+    //Function: Grabs 1000 documents from before the input
+    //timestamp.  
+    var getDataDated = function(){
+	$("#graphstatus").text("Loading data from date given, please wait...");
+        var graphtimestart = Number(Date.parse(graphdate))/1000;
+        var graphtimeend = graphtimestart + 3600; 
+        var views=[];
+	var ios5secresults=[];
+	var ios1minresults=[];
+	var ios15minresults=[];
+	var deltavresult;
+        var skey="?startkey=";
+        var ekey="&endkey=";
+        var foundkey="?key=";
+        var opts="&descending=true&limit=1";
+	for (var i=0; i<recents.length; i++){
+	    views.push(
+		$.getJSON(path+fivesecdb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
+		    //first, get the timestamp of the first data point in the range searched
+		    firstpttime = result.timestamp;
+                    //now, you grab the 1000 documents that exist before that timestamp
+		    $.getJSON(path+fivesecdb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
+                        ios5secresults.push(result2.rows);
+		    })
+                })
+	    );
+	    views.push(
+		$.getJSON(path+onemindb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
+		    //first, get the timestamp of the first data point in the range searched
+		    firstpttime = result.timestamp;
+                    //now, you grab the 1000 documents that exist before that timestamp
+		    $.getJSON(path+onemindb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
+                        ios5secresults.push(result2.rows);
+		    })
+                })
+	    );
+	    views.push(
+		$.getJSON(path+fifteenmindb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
+		    //first, get the timestamp of the first data point in the range searched
+		    firstpttime = result.timestamp;
+                    //now, you grab the 1000 documents that exist before that timestamp
+		    $.getJSON(path+fifteenmindb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
+                        ios5secresults.push(result2.rows);
+		    })
+                })
+	    );
+	}
+	views.push(
+            $.getJSON(path+onemindb+"/_view/pi_db"+skey+"\""+graphtimestart+"\""+ekey+"\""+opts,function(result){
+                firstpttime = result.timestamp;
+    	        $.getJSON(path+onemindb+"/_view/pi_db"+opts+docNumber,function(result2){
+		    deltavresult=result2.rows;
+	        })
+            })
+	);
+	//pulls all views simultaneously
+	hardToReadData={
+	    "ioss":[],
+	    "iosOnemin":[],
+	    "iosFifteenmin":[],
+	    "deltav":[]
+	};
+	$.when.apply($, views)
+	    .then(function(){
+		for (var i=0; i<sizes.ioss.length-1; i++){
+		    //arranges the results
+		    resultpos=$.grep(ios5secresults, function(e,f){return e[0].value.ios == i+1;});
+		    hTRDataDated.ioss[i]=resultpos[0];
+		    resultpos=$.grep(ios1minresults, function(e,f){return e[0].value.ios == i+1;});
+		    hTRDataDated.iosOnemin[i]=resultpos[0];
+		    resultpos=$.grep(ios15minresults, function(e,f){return e[0].value.ios == i+1;});
+		    hTRDataDated.iosFifteenmin[i]=resultpos[0];
+		}
+		hTRDataDated.deltav=deltavresult;
+		makeDataEasyToRead(hTRDataDated, true);
+		$("#graphstatus").text("Ready to make plots from date!");
+		$("#addplot").removeAttr("disabled");
+                graphdateold = graphdate;
+		return true;
+	    });
+    };
     
-    
-    var makeDataEasyToRead = function(hardToReadData){
+    //Takes data in the CouchDB format and rearranges in a more
+    //Usable format for the javascript code.
+    var makeDataEasyToRead = function(hardToReadData, hasDate){
 	var arrangedData={"ioss":[],"iosOnemin":[],"iosFifteenmin":[],"deltav":[]};
 	var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
 	var cardName="";
@@ -134,10 +226,16 @@ $.couch.app(function(app) {
 		}
 	    }
 	}
-	easyToReadData=arrangedData;
+        if(hasDate == false) {
+	    easyToReadData=arrangedData;
+        } else {
+            eTRDataDated = arrangedData;
+        }
     };
     
-    // create the master chart
+  // create the master chart and add a chart associated with the index given.
+  //This function will also continue to update the chart's series with the most
+  //recent database inputs.
   function createMaster(chartindex) {
       Highcharts.setOptions({
           global: {
@@ -223,20 +321,67 @@ $.couch.app(function(app) {
     });
   };
 
-                       //NOTES: So, in the .getJSON function, the options variable has the limit=1
-                       //in it.  So, This is why only one row is pulled from the database and updated
-                       //to the plot on the master plot every five seconds.  So, we need to make a similar
-                       //function to this to pull the 1000 data points from the date input by the user
-                       //and just plot that, then don't do any updating of the series being plotted.
-                       //BIG ISSUE RIGHT NOW: This function only APPENDS data points onto the current
-                       //easyToReadData object, which has the most recent 1000 points in the DB.  
-                       //Basically, I think I should also write a whole new data collection function that pulls
-                       //1000 points from whatever timestamp is defined in plots.js.  Then, we just make
-                       //a plot of those 1000 points if the graphingdate is not "Right Now".
- 						 
+  //Create the master chart and add a graph associated with the given chart index.
+  //This function does not produce charts that update; instead, it just graphs the
+  //data associated with whatever date is chosen by the user (this data is stored in
+  //the eTRDataDated variables).
+  function createMasterD(chartindex) {
+      Highcharts.setOptions({
+          global: {
+	      useUTC : false //puts timestamp axis in local time
+          }
+      });
+      $('#master-container'+chartindex).highcharts('StockChart', {	
+	  chart : {
+              events : {
+                  load : function () {
+                    var label = this.renderer.label(charts[chartindex].date, 100,120).add();
+                    setTimeout(function () {
+                        label.fadeout();
+                    }, 3000);
+		  }
+              }
+          },
+	  rangeSelector: {
+              buttons: [{
+                  count: 5,
+                  type: 'minute',
+                  text: '5m'
+              }, {
+                  count: 1,
+                  type: 'hour',
+                  text: '1hr'
+              }, {
+		  count: 6,
+                  type: 'hour',
+                  text: '6hr'
+              }, {
+                  type: 'all',
+                  text: 'All'
+              }],
+              inputEnabled: false, //prevents date range input 
+              selected: 1 //selects which button should be automatically pressed when the chart loads
+          },
+	  
+        title : {
+            text : charts[chartindex].name 
+        },
+
+        exporting: {
+            enabled: true
+        },
+
+        series : [{
+            name : 'Voltage',
+	    data : charts[chartindex].data
+        }]
+    });
+  };
+						 
 
 /*  Here begins the stuff that runs when the page loads  */
-  $("#graphingdate").text("Right now");
+  $("#graphingdate").text("Right Now");
+  graphdate=$("#graphingdate").text();
 
   $("#deleteplot").click(function(){
 	var selected=$("#name_dropdown :selected").val();
@@ -244,6 +389,8 @@ $.couch.app(function(app) {
 //	$("#graphstatus").text(JSON.stringify(easyToReadData));
   });
 
+  //When the Add Plot button is pushed, a graph is added to the charts section with the specifics given by the user.
+  //If a date aside from Right Now is input, the DB entries closest to the input date are graphed.
   $("#addplot").click(function(){
       var chartindex=charts.length;
       var selected=$("#name_dropdown :selected").val();
@@ -253,26 +400,55 @@ $.couch.app(function(app) {
 	      + "<\/div>"
       );
       if (names[selected].ios!=null) {
-	  charts[chartindex]={
-              "ios":names[selected].ios,
-              "card":names[selected].card,
-              "channel":names[selected].channel,
-              "name":names[selected].name,
-              "data":easyToReadData.ioss[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
-	      "dataOneMin":easyToReadData.iosOnemin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
-	      "dataFifteenMin":easyToReadData.iosFifteenmin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse()
-	  };
-	  createMaster(chartindex);
+          if (graphdate == "Right Now") {
+              charts[chartindex]={
+                  "ios":names[selected].ios,
+                  "card":names[selected].card,
+                  "channel":names[selected].channel,
+                  "name":names[selected].name,
+                  "date":graphdate,
+                  "data":easyToReadData.ioss[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
+	          "dataOneMin":easyToReadData.iosOnemin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
+	          "dataFifteenMin":easyToReadData.iosFifteenmin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse()
+	      };
+              createMaster(chartindex);
+          } else {
+              charts[chartindex]={
+                  "ios":names[selected].ios,
+                  "card":names[selected].card,
+                  "channel":names[selected].channel,
+                  "name":names[selected].name,
+                  "date":graphdate,
+                  "data":eTRDataDated.ioss[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
+	          "dataOneMin":eTRDataDated.iosOnemin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
+	          "dataFifteenMin":eTRDataDated.iosFifteenmin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse()
+              };
+              createMasterD(chartindex);
+         }
       } else {
-	  charts[chartindex]={
-              "name": names[selected].name,
-              "type": names[selected].type,
-              "id": names[selected].id,
-              "signal": names[selected].signal,
-              "channel": names[selected].channel,
-              "data": easyToReadData.deltav[names[selected].channel].data.reverse()
-	  };
-	  createMaster(chartindex);
+	  if (graphdate == "Right Now") {
+              charts[chartindex]={
+                  "name": names[selected].name,
+                  "type": names[selected].type,
+                  "id": names[selected].id,
+                  "date": graphdate,
+                  "signal": names[selected].signal,
+                  "channel": names[selected].channel,
+                  "data": easyToReadData.deltav[names[selected].channel].data.reverse()
+	      }; 
+	      createMaster(chartindex);
+          } else {
+              charts[chartindex]={
+                  "name": names[selected].name,
+                  "type": names[selected].type,
+                  "id": names[selected].id,
+                  "date": graphdate,
+                  "signal": names[selected].signal,
+                  "channel": names[selected].channel,
+                  "data": eTRDataDated.deltav[names[selected].channel].data.reverse()
+	      }; 
+	      createMasterD(chartindex);
+          }
       }
   });
 
@@ -286,6 +462,8 @@ $.couch.app(function(app) {
     else {
       $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00 GMT");
     }
+      graphdate=$("#graphingdate").text();
+      getDataDated();
   });
 
   retrieveSizes(function(){
@@ -328,8 +506,12 @@ $.couch.app(function(app) {
       };
       nameindex++;
     }
-
-    getData();
+    if(graphdate != "Right Now" && graphdate != graphdateold) {
+        getDataDated();
+    }
+    if(graphdate == "Right Now") {
+        getData();
+    }
       
   });
 });
