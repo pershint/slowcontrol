@@ -99,56 +99,65 @@ $.couch.app(function(app) {
         var graphtimestart = Number(Date.parse(graphdate))/1000;
         var graphtimeend = graphtimestart + 3600; 
         var views=[];
+        var ios5seckey;
+        var ios1minkey;
+        var ios15minkey;
 	var ios5secresults=[];
 	var ios1minresults=[];
 	var ios15minresults=[];
 	var deltavresult;
         var knownstart = 1466441709;
         var knownend = 1466441697;
-        var skey="/by_timestamp?startkey=";
+        var skey="?startkey=";
         var ekey="&endkey=";
         var foundkey="?key=";
         var opts="&descending=true&limit=1";
+        //First, find the proper timestamp; this is demo code to make sure the query syntax is right
+        var got5secdata = false;
+      	for (var i=0; i<recents.length; i++){
+            while (got5secdata == false) {
+	        //$.getJSON(path+fivesecdb+recents[i]+skey+graphtimestart+ekey+graphtimeend+opts).success(function(result, txtstatus,jqxobj){
+	        $.getJSON(path+fivesecdb+recents[i]+foundkey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                    if(result.rows[0] !== undefined){
+                        $("#graphstatus").text(result.rows[0].key);
+                        ios5secresults.push(result.rows);
+                        ios5seckey = result.timestamp;
+                        got5secdata = true;
+                    } else {
+                        graphtimestart+=1;
+                    }
+	        }).error(function(error){
+                    console.log(error);
+                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+               });
+            }
+        }
 	for (var i=0; i<recents.length; i++){
 	    views.push(
-		$.getJSON(path+fivesecdb+recents[i]+skey+knownstart+ekey+knownend+opts,function(result){
-		    //first, get the timestamp of the first data point in the range searched
-		    firstpttime = result.timestamp;
-                    //now, you grab the 1000 documents that exist before that timestamp
-		    $.getJSON(path+fivesecdb+recents[i]+foundkey+firstpttime+opts+docNumber,function(result2){
-                        ios5secresults.push(result2.rows);
-		    })
-                })
+		$.getJSON(path+fivesecdb+recents[i]+options+docNumber,function(result){
+		    //collects the results but in whatever order they arrive
+		    ios5secresults.push(result.rows);
+		})
 	    );
 	    views.push(
-		$.getJSON(path+onemindb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
-		    //first, get the timestamp of the first data point in the range searched
-		    firstpttime = result.timestamp;
-                    //now, you grab the 1000 documents that exist before that timestamp
-		    $.getJSON(path+onemindb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
-                        ios5secresults.push(result2.rows);
-		    })
-                })
+		$.getJSON(path+onemindb+recents[i]+options+docNumber,function(result){
+		    //collects the results but in whatever order they arrive
+		    ios1minresults.push(result.rows);
+		})
 	    );
 	    views.push(
-		$.getJSON(path+fifteenmindb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
-		    //first, get the timestamp of the first data point in the range searched
-		    firstpttime = result.timestamp;
-                    //now, you grab the 1000 documents that exist before that timestamp
-		    $.getJSON(path+fifteenmindb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
-                        ios5secresults.push(result2.rows);
-		    })
-                })
+		$.getJSON(path+fifteenmindb+recents[i]+options+docNumber,function(result){
+		    //collects the results but in whatever order they arrive
+		    ios15minresults.push(result.rows);
+		})
 	    );
 	}
 	views.push(
-            $.getJSON(path+onemindb+"/_view/pi_db"+skey+"\""+graphtimestart+"\""+ekey+"\""+opts,function(result){
-                firstpttime = result.timestamp;
-    	        $.getJSON(path+onemindb+"/_view/pi_db"+opts+docNumber,function(result2){
-		    deltavresult=result2.rows;
-	        })
-            })
+	    $.getJSON(path+onemindb+"/_view/pi_db"+options+docNumber,function(result){
+		deltavresult=result.rows;
+	    })
 	);
+		);
 	//pulls all views simultaneously
 	hardToReadData={
 	    "ioss":[],
@@ -174,6 +183,7 @@ $.couch.app(function(app) {
                 graphdateold = graphdate;
 		return true;
 	    });
+    */
     };
     
     //Takes data in the CouchDB format and rearranges in a more
