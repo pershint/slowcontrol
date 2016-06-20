@@ -102,6 +102,7 @@ $.couch.app(function(app) {
         var ios5seckey = [];
         var ios1minkey = [];
         var ios15minkey = [];
+        var deltavkey;
 	var ios5secresults=[];
 	var ios1minresults=[];
 	var ios15minresults=[];
@@ -110,6 +111,8 @@ $.couch.app(function(app) {
         var knownstart = 1466441709;
         var knownend = 1466441697;
         var key="?key=";
+        var skey="?startkey=";
+        var ekey="&endkey=";
         var opts="&descending=true&limit=1";
         var got5seckey = [];
         var got1minkey = [];
@@ -117,82 +120,60 @@ $.couch.app(function(app) {
 
         //First, find the proper timestamps; this is demo code to make sure the query syntax is right
       	for (var i=0; i<recents.length; i++){
-           got5seckey[i] = false;
-           while (got5seckey[i] == false) {
-	        //$.getJSON(path+fivesecdb+recents[i]+skey+graphtimestart+ekey+graphtimeend+opts).success(function(result, txtstatus,jqxobj){
-	        $.getJSON(path+fivesecdb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                    if(result.rows[0] !== undefined){
-                        $("#graphstatus").text(result.rows[0].key);
-                        ios5seckey[i] = result.rows[0].key;
-                        got5seckey[i] = true;
-                    } else {
-                        graphtimestart+=1;
-                    }
-	        }).error(function(error){
-                    console.log(error);
-                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-               });
-            }
+            got5seckey[i] = false;
+            $.getJSON(path+fivesecdb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                if(result.rows[0] !== undefined){
+                    ios5seckey[i] = result.rows[0].key;
+                    got5seckey[i] = true;
+                } else {
+                    $("#graphstatus").text("No fivesecondDB data present on one of the IOSes for this hour.");
+                    got5seckey[i] = false;                        
+                }
+	    }).error(function(error){
+                console.log(error);
+                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+            });
+           
+            got1minkey[i] = false;
+	    $.getJSON(path+onemindb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                if(result.rows[0] !== undefined){
+                    ios1minkey[i] = result.rows[0].key;
+                    got1minkey[i] = true;
+                } else {
+                    $("#graphstatus").text("No oneminDB data present on one of the IOSes for this hour.");
+                }
+	    }).error(function(error){
+                console.log(error);
+                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+            });
+
+            got15minkey[i] = false;
+	    $.getJSON(path+fifteenmindb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                if(result.rows[0] !== undefined){
+                    ios15minkey[i] = result.rows[0].key;
+                    got15minkey[i] = true;
+                } else {
+                    $("#graphstatus").text("Missing fifteenmindb data for one of the IOSes.");
+                }
+	    }).error(function(error){
+                console.log(error);
+                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+            });
         }
 
-
-      	for (var i=0; i<recents.length; i++){
-           got1minkey[i] = false;
-           while (got1minkey[i] == false) {
-	        $.getJSON(path+onemindb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                    if(result.rows[0] !== undefined){
-                        $("#graphstatus").text(result.rows[0].key);
-                        ios1minkey[i] = result.rows[0].key;
-                        got1minkey[i] = true;
-                    } else {
-                        graphtimestart+=1;
-                    }
-	        }).error(function(error){
-                    console.log(error);
-                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-               });
+        gotdeltavkey = false;
+        $.getJSON(path+onemindb+"/_view/pi_db"+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+            if(result.rows[0] !== undefined){
+                deltavkey = result.rows[0].key;
+                gotdeltavkey = true;
+            } else {
+                $("#graphstatus").text("No PI_DB data during the hour specified.");
             }
-        }
-
-
-      	for (var i=0; i<recents.length; i++){
-           got15minkey[i] = false;
-           while (got15minkey[i] == false) {
-	        $.getJSON(path+fifteenmindb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                    if(result.rows[0] !== undefined){
-                        $("#graphstatus").text(result.rows[0].key);
-                        ios15minkey[i] = result.rows[0].key;
-                        got15minkey[i] = true;
-                    } else {
-                        graphtimestart+=1;
-                    }
-	        }).error(function(error){
-                    console.log(error);
-                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-               });
-            }
-        }
-
-
-      	for (var i=0; i<recents.length; i++){
-           gotdeltavkey = false;
-           while (gotdeltavkey == false) {
-	        $.getJSON(path+onemindb+"/_view/pi_db"+key+graphtimestart+opts+docNumber).success(function(result, txtstatus,jqxobj){
-                    if(result.rows[0] !== undefined){
-                        $("#graphstatus").text(result.rows[0].key);
-                        deltavkey = result.rows[0].key;
-                        gotdeltavkey = true;
-                    } else {
-                        graphtimestart+=1;
-                    }
-	        }).error(function(error){
-                    console.log(error);
-                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-               });
-            }
-        }
-
-
+	}).error(function(error){
+            console.log(error);
+            $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+        });
+    
         //Now, use the found timestamps and push the data to views
 	for (var i=0; i<recents.length; i++){
 	    views.push(
@@ -220,7 +201,7 @@ $.couch.app(function(app) {
 	    })
 	);
 	//pulls all views simultaneously
-	hardToReadData={
+	hTRDataDated={
 	    "ioss":[],
 	    "iosOnemin":[],
 	    "iosFifteenmin":[],
