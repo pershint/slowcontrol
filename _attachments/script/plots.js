@@ -99,30 +99,32 @@ $.couch.app(function(app) {
         var graphtimestart = Number(Date.parse(graphdate))/1000;
         var graphtimeend = graphtimestart + 3600; 
         var views=[];
-        var ios5seckey;
-        var ios1minkey;
-        var ios15minkey;
+        var ios5seckey = [];
+        var ios1minkey = [];
+        var ios15minkey = [];
 	var ios5secresults=[];
 	var ios1minresults=[];
 	var ios15minresults=[];
 	var deltavresult;
+        var gotdeltavkey;
         var knownstart = 1466441709;
         var knownend = 1466441697;
-        var skey="?startkey=";
-        var ekey="&endkey=";
-        var foundkey="?key=";
+        var key="?key=";
         var opts="&descending=true&limit=1";
-        //First, find the proper timestamp; this is demo code to make sure the query syntax is right
-        var got5secdata = false;
+        var got5seckey = [];
+        var got1minkey = [];
+        var got15minkey = [];
+
+        //First, find the proper timestamps; this is demo code to make sure the query syntax is right
       	for (var i=0; i<recents.length; i++){
-            while (got5secdata == false) {
+           got5seckey[i] = false;
+           while (got5seckey[i] == false) {
 	        //$.getJSON(path+fivesecdb+recents[i]+skey+graphtimestart+ekey+graphtimeend+opts).success(function(result, txtstatus,jqxobj){
-	        $.getJSON(path+fivesecdb+recents[i]+foundkey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+	        $.getJSON(path+fivesecdb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
                     if(result.rows[0] !== undefined){
                         $("#graphstatus").text(result.rows[0].key);
-                        ios5secresults.push(result.rows);
-                        ios5seckey = result.timestamp;
-                        got5secdata = true;
+                        ios5seckey[i] = result.rows[0].key;
+                        got5seckey[i] = true;
                     } else {
                         graphtimestart+=1;
                     }
@@ -132,32 +134,91 @@ $.couch.app(function(app) {
                });
             }
         }
+
+
+      	for (var i=0; i<recents.length; i++){
+           got1minkey[i] = false;
+           while (got1minkey[i] == false) {
+	        $.getJSON(path+onemindb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                    if(result.rows[0] !== undefined){
+                        $("#graphstatus").text(result.rows[0].key);
+                        ios1minkey[i] = result.rows[0].key;
+                        got1minkey[i] = true;
+                    } else {
+                        graphtimestart+=1;
+                    }
+	        }).error(function(error){
+                    console.log(error);
+                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+               });
+            }
+        }
+
+
+      	for (var i=0; i<recents.length; i++){
+           got15minkey[i] = false;
+           while (got15minkey[i] == false) {
+	        $.getJSON(path+fifteenmindb+recents[i]+key+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
+                    if(result.rows[0] !== undefined){
+                        $("#graphstatus").text(result.rows[0].key);
+                        ios15minkey[i] = result.rows[0].key;
+                        got15minkey[i] = true;
+                    } else {
+                        graphtimestart+=1;
+                    }
+	        }).error(function(error){
+                    console.log(error);
+                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+               });
+            }
+        }
+
+
+      	for (var i=0; i<recents.length; i++){
+           gotdeltavkey = false;
+           while (gotdeltavkey == false) {
+	        $.getJSON(path+onemindb+"/_view/pi_db"+key+graphtimestart+opts+docNumber).success(function(result, txtstatus,jqxobj){
+                    if(result.rows[0] !== undefined){
+                        $("#graphstatus").text(result.rows[0].key);
+                        deltavkey = result.rows[0].key;
+                        gotdeltavkey = true;
+                    } else {
+                        graphtimestart+=1;
+                    }
+	        }).error(function(error){
+                    console.log(error);
+                    $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
+               });
+            }
+        }
+
+
+        //Now, use the found timestamps and push the data to views
 	for (var i=0; i<recents.length; i++){
 	    views.push(
-		$.getJSON(path+fivesecdb+recents[i]+options+docNumber,function(result){
+		$.getJSON(path+fivesecdb+recents[i]+key+ios5seckey[i]+options+docNumber,function(result){
 		    //collects the results but in whatever order they arrive
 		    ios5secresults.push(result.rows);
 		})
 	    );
 	    views.push(
-		$.getJSON(path+onemindb+recents[i]+options+docNumber,function(result){
+		$.getJSON(path+onemindb+recents[i]+key+ios1minkey[i]+options+docNumber,function(result){
 		    //collects the results but in whatever order they arrive
 		    ios1minresults.push(result.rows);
 		})
 	    );
 	    views.push(
-		$.getJSON(path+fifteenmindb+recents[i]+options+docNumber,function(result){
+		$.getJSON(path+fifteenmindb+recents[i]+key+ios15minkey[i]+options+docNumber,function(result){
 		    //collects the results but in whatever order they arrive
 		    ios15minresults.push(result.rows);
 		})
 	    );
 	}
 	views.push(
-	    $.getJSON(path+onemindb+"/_view/pi_db"+options+docNumber,function(result){
+	    $.getJSON(path+onemindb+"/_view/pi_db"+key+deltavkey+options+docNumber,function(result){
 		deltavresult=result.rows;
 	    })
 	);
-		);
 	//pulls all views simultaneously
 	hardToReadData={
 	    "ioss":[],
@@ -183,7 +244,6 @@ $.couch.app(function(app) {
                 graphdateold = graphdate;
 		return true;
 	    });
-    */
     };
     
     //Takes data in the CouchDB format and rearranges in a more
