@@ -103,17 +103,19 @@ $.couch.app(function(app) {
 	var ios1minresults=[];
 	var ios15minresults=[];
 	var deltavresult;
-        var skey="?startkey=";
+        var knownstart = 1466441709;
+        var knownend = 1466441697;
+        var skey="/by_timestamp?startkey=";
         var ekey="&endkey=";
         var foundkey="?key=";
         var opts="&descending=true&limit=1";
 	for (var i=0; i<recents.length; i++){
 	    views.push(
-		$.getJSON(path+fivesecdb+recents[i]+skey+"\""+graphtimestart+"\""+ekey+"\""+graphtimeend+"\""+opts,function(result){
+		$.getJSON(path+fivesecdb+recents[i]+skey+knownstart+ekey+knownend+opts,function(result){
 		    //first, get the timestamp of the first data point in the range searched
 		    firstpttime = result.timestamp;
                     //now, you grab the 1000 documents that exist before that timestamp
-		    $.getJSON(path+fivesecdb+recents[i]+foundkey+"\""+firstpttime+"\""+opts+docNumber,function(result2){
+		    $.getJSON(path+fivesecdb+recents[i]+foundkey+firstpttime+opts+docNumber,function(result2){
                         ios5secresults.push(result2.rows);
 		    })
                 })
