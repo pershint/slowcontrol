@@ -99,6 +99,7 @@ $.couch.app(function(app) {
         var graphtimestart = Number(Date.parse(graphdate))/1000;
         var graphtimeend = graphtimestart + 3600; 
         var views=[];
+        var keys=[];
         var ios5seckey = [];
         var ios1minkey = [];
         var ios15minkey = [];
@@ -133,32 +134,6 @@ $.couch.app(function(app) {
                 console.log(error);
                 $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
             });
-           
-            got1minkey[i] = false;
-	    $.getJSON(path+onemindb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                if(result.rows[0] !== undefined){
-                    ios1minkey[i] = result.rows[0].key;
-                    got1minkey[i] = true;
-                } else {
-                    $("#graphstatus").text("No oneminDB data present on one of the IOSes for this hour.");
-                }
-	    }).error(function(error){
-                console.log(error);
-                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-            });
-
-            got15minkey[i] = false;
-	    $.getJSON(path+fifteenmindb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                if(result.rows[0] !== undefined){
-                    ios15minkey[i] = result.rows[0].key;
-                    got15minkey[i] = true;
-                } else {
-                    $("#graphstatus").text("Missing fifteenmindb data for one of the IOSes.");
-                }
-	    }).error(function(error){
-                console.log(error);
-                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-            });
         }
 
         gotdeltavkey = false;
@@ -177,34 +152,20 @@ $.couch.app(function(app) {
         //Now, use the found timestamps and push the data to views
 	for (var i=0; i<recents.length; i++){
 	    views.push(
-		$.getJSON(path+fivesecdb+recents[i]+key+ios5seckey[i]+options+docNumber,function(result){
+		$.getJSON(path+fivesecdb+recents[i]+skey+ios5seckey[i]+opts+docNumber,function(result){
 		    //collects the results but in whatever order they arrive
 		    ios5secresults.push(result.rows);
 		})
 	    );
-	    views.push(
-		$.getJSON(path+onemindb+recents[i]+key+ios1minkey[i]+options+docNumber,function(result){
-		    //collects the results but in whatever order they arrive
-		    ios1minresults.push(result.rows);
-		})
-	    );
-	    views.push(
-		$.getJSON(path+fifteenmindb+recents[i]+key+ios15minkey[i]+options+docNumber,function(result){
-		    //collects the results but in whatever order they arrive
-		    ios15minresults.push(result.rows);
-		})
-	    );
 	}
 	views.push(
-	    $.getJSON(path+onemindb+"/_view/pi_db"+key+deltavkey+options+docNumber,function(result){
+	    $.getJSON(path+onemindb+"/_view/pi_db"+skey+deltavkey+opts+docNumber,function(result){
 		deltavresult=result.rows;
 	    })
 	);
 	//pulls all views simultaneously
 	hTRDataDated={
 	    "ioss":[],
-	    "iosOnemin":[],
-	    "iosFifteenmin":[],
 	    "deltav":[]
 	};
 	$.when.apply($, views)
@@ -213,10 +174,6 @@ $.couch.app(function(app) {
 		    //arranges the results
 		    resultpos=$.grep(ios5secresults, function(e,f){return e[0].value.ios == i+1;});
 		    hTRDataDated.ioss[i]=resultpos[0];
-		    resultpos=$.grep(ios1minresults, function(e,f){return e[0].value.ios == i+1;});
-		    hTRDataDated.iosOnemin[i]=resultpos[0];
-		    resultpos=$.grep(ios15minresults, function(e,f){return e[0].value.ios == i+1;});
-		    hTRDataDated.iosFifteenmin[i]=resultpos[0];
 		}
 		hTRDataDated.deltav=deltavresult;
 		makeDataEasyToRead(hTRDataDated, true);
@@ -226,13 +183,17 @@ $.couch.app(function(app) {
 		return true;
 	    });
     };
-    
+ 
     //Takes data in the CouchDB format and rearranges in a more
     //Usable format for the javascript code.
     var makeDataEasyToRead = function(hardToReadData, hasDate){
 	var arrangedData={"ioss":[],"iosOnemin":[],"iosFifteenmin":[],"deltav":[]};
-	var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
-	var cardName="";
+	if(hasDate == false) {
+            var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
+	} else {
+            var db_list=[{"name":"ioss","property":"voltages"}];
+        }
+        var cardName="";
 	for (var db=0; db<db_list.length; db++){
 	    for (var ios=0; ios<sizes.ioss.length-1; ios++){
 		var arranged = arrangedData[db_list[db]["name"]];
@@ -385,7 +346,7 @@ $.couch.app(function(app) {
           }
       });
       $('#master-container'+chartindex).highcharts('StockChart', {	
-	  chart : {
+	  /*chart : {
               events : {
                   load : function () {
                     var label = this.renderer.label(charts[chartindex].date, 100,120).add();
@@ -394,7 +355,7 @@ $.couch.app(function(app) {
                     }, 3000);
 		  }
               }
-          },
+          },*/
 	  rangeSelector: {
               buttons: [{
                   count: 5,
@@ -417,7 +378,7 @@ $.couch.app(function(app) {
           },
 	  
         title : {
-            text : charts[chartindex].name 
+            text : charts[chartindex].name + " , " + charts[chartindex].date
         },
 
         exporting: {
@@ -439,7 +400,6 @@ $.couch.app(function(app) {
   $("#deleteplot").click(function(){
 	var selected=$("#name_dropdown :selected").val();
 	$("."+selected+"chart").css({"display":"none"});
-//	$("#graphstatus").text(JSON.stringify(easyToReadData));
   });
 
   //When the Add Plot button is pushed, a graph is added to the charts section with the specifics given by the user.
@@ -473,8 +433,6 @@ $.couch.app(function(app) {
                   "name":names[selected].name,
                   "date":graphdate,
                   "data":eTRDataDated.ioss[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
-	          "dataOneMin":eTRDataDated.iosOnemin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse(),
-	          "dataFifteenMin":eTRDataDated.iosFifteenmin[names[selected].ios].cards[names[selected].card].channels[names[selected].channel].data.reverse()
               };
               createMasterD(chartindex);
          }
@@ -514,9 +472,15 @@ $.couch.app(function(app) {
     }
     else {
       $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00 GMT");
-    }
       graphdate=$("#graphingdate").text();
       getDataDated();
+    }
+  });
+
+  $("#setPlotNow").click(function(){
+      $("#graphingdate").text("Right Now");
+      graphdate=$("#graphingdate").text();
+      $("#graphstatus").text("Ready to make live plots!");
   });
 
   retrieveSizes(function(){
