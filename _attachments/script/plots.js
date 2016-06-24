@@ -101,12 +101,8 @@ $.couch.app(function(app) {
         var views=[];
         var keys=[];
         var ios5seckey = [];
-        var ios1minkey = [];
-        var ios15minkey = [];
         var deltavkey;
 	var ios5secresults=[];
-	var ios1minresults=[];
-	var ios15minresults=[];
 	var deltavresult;
         var gotdeltavkey;
         var knownstart = 1466441709;
@@ -116,24 +112,26 @@ $.couch.app(function(app) {
         var ekey="&endkey=";
         var opts="&descending=true&limit=1";
         var got5seckey = [];
-        var got1minkey = [];
-        var got15minkey = [];
+
+//So, I do in fact need to use the $.when(apply... stuff for the first call in the function as well.  Doing so makes the interpreter wait to run whatever's in the when section until it's given the variables it's promised.  
 
         //First, find the proper timestamps; this is demo code to make sure the query syntax is right
       	for (var i=0; i<recents.length; i++){
             got5seckey[i] = false;
-            $.getJSON(path+fivesecdb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-                if(result.rows[0] !== undefined){
-                    ios5seckey[i] = result.rows[0].key;
-                    got5seckey[i] = true;
-                } else {
-                    $("#graphstatus").text("No fivesecondDB data present on one of the IOSes for this hour.");
-                    got5seckey[i] = false;                        
-                }
-	    }).error(function(error){
+            keys.push(
+                $.getJSON(path+fivesecdb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts)).then(function(result){ios5seckey[i]=result.rows[0].key;});
+/*	    }).error(function(error){
                 console.log(error);
                 $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
             });
+*/
+            if(ios5seckey[i] !== undefined){
+                got5seckey[i] = true;
+            } else {
+                $("#graphstatus").text("No fivesecondDB data present on one of the IOSes for this hour.");
+                ios5seckey[i] = 0;
+                got5seckey[i] = false;                        
+            }
         }
 
         gotdeltavkey = false;
@@ -206,25 +204,31 @@ $.couch.app(function(app) {
 			"channels":[],
 			"card":cardName
 		    };
-		    for (channel=0; channel<hard[ios][0].value[cardName][property].length; channel++){
-			arranged[ios].cards[card].channels[channel]={
-			    "data":[]
-			};
-		    }
-		    for (var row=0; row<hard[ios].length; row++){
-			try{
-			    for (channel=0; channel<arranged[ios].cards[card].channels.length; channel++){
-			        arranged[ios].cards[card].channels[channel].data[row]=[hard[ios][row].key*1000,hard[ios][row].value[cardName][property][channel]];
+                    try{
+		        for (channel=0; channel<hard[ios][0].value[cardName][property].length; channel++){
+			    arranged[ios].cards[card].channels[channel]={
+			        "data":[]
+		 	    };
+		        }
+		        for (var row=0; row<hard[ios].length; row++){
+			    try{
+			        for (channel=0; channel<arranged[ios].cards[card].channels.length; channel++){
+			            arranged[ios].cards[card].channels[channel].data[row]=[hard[ios][row].key*1000,hard[ios][row].value[cardName][property][channel]];
+			        }
 			    }
-			}
-			catch(err){
-			    // Bad row in your data, either from empty card names or bad channel entries.  Skip row and move on
-			    //FIXME Make a better pop-up window here; the window alert freezes everything up.
-                            //window.alert("WARNING: Bad data row reading from CouchDB.  IOS: " + ios + " card: " + cardName + " channel: " + channel + " Database: " + db_list[db]["name"] + " timestamp: " + hard[ios][row].key + "  Skipping row and continuing graphing, but check couchDB for data errors");
-			    row++;
-			}
+			    catch(err){
+			        // Bad row in your data, either from empty card names or bad channel entries.  Skip row and move on
+			        //FIXME Make a better pop-up window here; the window alert freezes everything up.
+                                //window.alert("WARNING: Bad data row reading from CouchDB.  IOS: " + ios + " card: " + cardName + " channel: " + channel + " Database: " + db_list[db]["name"] + " timestamp: " + hard[ios][row].key + "  Skipping row and continuing graphing, but check couchDB for data errors");
+			        row++;
+			    }
+		        }
 		    }
-		}
+                    catch(err){
+                        channel++;
+                        $("#graphstatus").text("Empty values in " + property + " data acquisition.  Probably will not plot correctly.");
+                    }
+                }
 	    }
 	}
 
@@ -232,13 +236,18 @@ $.couch.app(function(app) {
 	    arrangedData.deltav[channel]={"data":[]};
 	    cleanedtype=sizes.deltav[channel].type;
 	    deltavid=sizes.deltav[channel].id-1;
-	    if (hardToReadData.deltav[0].value[cleanedtype].values[deltavid]){
-		for (var row=0; row<hardToReadData.deltav.length; row++){
-		    if (hardToReadData.deltav[row].value[cleanedtype].values[deltavid]!="N/A"){
-	      arrangedData.deltav[channel].data.push([hardToReadData.deltav[row].key*1000,hardToReadData.deltav[row].value[cleanedtype].values[deltavid]]);
-		    }
-		}
-	    }
+            try{
+ 	        if (hardToReadData.deltav[0].value[cleanedtype].values[deltavid]){
+		    for (var row=0; row<hardToReadData.deltav.length; row++){
+		        if (hardToReadData.deltav[row].value[cleanedtype].values[deltavid]!="N/A"){
+	                    arrangedData.deltav[channel].data.push([hardToReadData.deltav[row].key*1000,hardToReadData.deltav[row].value[cleanedtype].values[deltavid]]);
+		        }
+		    } 
+	        }
+            }
+            catch(err){
+                $("#graphstatus").text("Error in pulling data for " + cleanedtype + "Data.  No data may be present for range.  Check database.");
+            }
 	}
         if(hasDate == false) {
 	    easyToReadData=arrangedData;
