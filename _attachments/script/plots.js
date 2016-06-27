@@ -101,85 +101,81 @@ $.couch.app(function(app) {
         var views=[];
         var keys=[];
         var ios5seckey = [];
+        var ios5seckeygrab = [];
         var deltavkey;
-	var ios5secresults=[];
+        var deltavkeygrab;
+        var keygrabpos=[];
+        var ios5secresults=[];
 	var deltavresult;
-        var gotdeltavkey;
-        var knownstart = 1466441709;
-        var knownend = 1466441697;
         var key="?key=";
         var skey="?startkey=";
         var ekey="&endkey=";
         var opts="&descending=true&limit=1";
-        var got5seckey = [];
 
 //So, I do in fact need to use the $.when(apply... stuff for the first call in the function as well.  Doing so makes the interpreter wait to run whatever's in the when section until it's given the variables it's promised.  
 
-        //First, find the proper timestamps; this is demo code to make sure the query syntax is right
+        //For each IOS, find a database entry near the proper timestamp
       	for (var i=0; i<recents.length; i++){
-            got5seckey[i] = false;
             keys.push(
-                $.getJSON(path+fivesecdb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts)).then(function(result){ios5seckey[i]=result.rows[0].key;});
-/*	    }).error(function(error){
-                console.log(error);
-                $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-            });
-*/
-            if(ios5seckey[i] !== undefined){
-                got5seckey[i] = true;
-            } else {
-                $("#graphstatus").text("No fivesecondDB data present on one of the IOSes for this hour.");
-                ios5seckey[i] = 0;
-                got5seckey[i] = false;                        
-            }
+                $.getJSON(path+fivesecdb+recents[i]+skey+graphtimeend+ekey+graphtimestart+opts,function(result){
+                    ios5seckeygrab.push(result.rows);
+                })
+            );
         }
 
-        gotdeltavkey = false;
-        $.getJSON(path+onemindb+"/_view/pi_db"+skey+graphtimeend+ekey+graphtimestart+opts).success(function(result, txtstatus,jqxobj){
-            if(result.rows[0] !== undefined){
-                deltavkey = result.rows[0].key;
-                gotdeltavkey = true;
-            } else {
-                $("#graphstatus").text("No PI_DB data during the hour specified.");
-            }
-	}).error(function(error){
-            console.log(error);
-            $("#graphstatus").text("Error trying to pull data from CouchDB.  Check replication status.");
-        });
-    
-        //Now, use the found timestamps and push the data to views
-	for (var i=0; i<recents.length; i++){
-	    views.push(
-		$.getJSON(path+fivesecdb+recents[i]+skey+ios5seckey[i]+opts+docNumber,function(result){
-		    //collects the results but in whatever order they arrive
-		    ios5secresults.push(result.rows);
-		})
-	    );
-	}
-	views.push(
-	    $.getJSON(path+onemindb+"/_view/pi_db"+skey+deltavkey+opts+docNumber,function(result){
-		deltavresult=result.rows;
-	    })
-	);
-	//pulls all views simultaneously
-	hTRDataDated={
-	    "ioss":[],
-	    "deltav":[]
-	};
-	$.when.apply($, views)
+        keys.push(
+            $.getJSON(path+onemindb+"/_view/pi_db"+skey+graphtimeend+ekey+graphtimestart+opts, function(result){
+                deltavkeygrab = result.rows[0].key;
+            })
+       );
+
+        //Now, push all of the key grab results simultaneously.  Now that keys
+        //Are grabbed, also pull the 1000 DB entries before that timestamp.
+	$.when.apply($, keys)
 	    .then(function(){
 		for (var i=0; i<sizes.ioss.length-1; i++){
-		    //arranges the results
-		    resultpos=$.grep(ios5secresults, function(e,f){return e[0].value.ios == i+1;});
-		    hTRDataDated.ioss[i]=resultpos[0];
+		    //arranges the results by IOS no.
+		    keygrabpos=$.grep(ios5seckeygrab, function(e,f){return e[0].value.ios == i+1;});
+                    ios5seckey[i]=keygrabpos[0][0].key;
 		}
-		hTRDataDated.deltav=deltavresult;
-		makeDataEasyToRead(hTRDataDated, true);
-		$("#graphstatus").text("Ready to make plots from date!");
-		$("#addplot").removeAttr("disabled");
-                graphdateold = graphdate;
-		return true;
-	    });
+		deltavkey=deltavkeygrab;
+  
+            //Use the found timestamps to get DB entries
+	    for (var i=0; i<recents.length; i++){
+	        views.push(
+	  	    $.getJSON(path+fivesecdb+recents[i]+skey+ios5seckey[i]+opts+docNumber,function(result){
+		        //collects the results but in whatever order they arrive
+		        ios5secresults.push(result.rows);
+		    })
+	        );
+	    }
+	    views.push(
+	        $.getJSON(path+onemindb+"/_view/pi_db"+skey+deltavkey+opts+docNumber,function(result){
+		    deltavresult=result.rows;
+	        })
+	    );
+
+	    //Once all queries are complete, arranges the views and then
+            //Uses MakeDataEasytoRead to rearrange DB entries
+	    hTRDataDated={
+	        "ioss":[],
+	        "deltav":[]
+	    };
+	    $.when.apply($, views)
+	        .then(function(){
+		    for (var i=0; i<sizes.ioss.length-1; i++){
+		        //arranges the results
+		        resultpos=$.grep(ios5secresults, function(e,f){return e[0].value.ios == i+1;});
+		        hTRDataDated.ioss[i]=resultpos[0];
+		    }
+		    hTRDataDated.deltav=deltavresult;
+		    makeDataEasyToRead(hTRDataDated, true);
+		    $("#graphstatus").text("Ready to make plots from date!");
+		    $("#addplot").removeAttr("disabled");
+                    graphdateold = graphdate;
+		    return true;
+	        });
+        });
     };
  
     //Takes data in the CouchDB format and rearranges in a more
