@@ -663,87 +663,90 @@ $.couch.app(function(app) {
 
 
   $("#saveThresholds").click(function(){
-    var pwdtry= $("#pwd-text").val()
-    pwdhash=pwdtry.hashCode()
-    //Get hash from couchDB channeldb
-    //$.getJSON(
-
-    $("#statustext").text("Saving.");
-    $(".present").css({"display":"none"});
-    $(".approved").css({"display":"none"});
-    filledThresholdData=sizes;
-    for (var ios=0; ios<sizes.ioss.length; ios++){
-      for (var card=0; card<sizes.ioss[ios].cards.length; card++){
-        for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; 
-        channel++){
-          var channelid = "_ios"+ios+"card"+card+"channel"+channel;
-          if (sizes.ioss[ios].cards[card].channels[channel].lolo!=null){
-            filledThresholdData.ioss[ios].cards[card].channels[channel].lolo=
-            parseFloat($("#lolo"+channelid).val());
-            filledThresholdData.ioss[ios].cards[card].channels[channel].lo=
-            parseFloat($("#lo"+channelid).val());
-            filledThresholdData.ioss[ios].cards[card].channels[channel].hi=
-            parseFloat($("#hi"+channelid).val());
-            filledThresholdData.ioss[ios].cards[card].channels[channel].hihi=
-            parseFloat($("#hihi"+channelid).val());
-          }
-          if (sizes.ioss[ios].cards[card].channels[channel].isEnabled!=null){
-            if ($("#isEnabled"+channelid).prop("checked")){
-              filledThresholdData.ioss[ios].cards[card].channels[channel].isEnabled=1;
-            } else {
-              filledThresholdData.ioss[ios].cards[card].channels[channel].isEnabled=0;
+    var pwdresp = sizes.threshhash;
+    var pwdtext= $("#pwd-text").val()
+    var pwd = pwdtext + "61243370981";
+    pwd = pwd.hashCode();
+    if(pwd != pwdresp) {
+        window.alert("Password incorrect.  Please try again.");
+    } else {
+      $("#statustext").text("Saving.");
+      $(".present").css({"display":"none"});
+      $(".approved").css({"display":"none"});
+      filledThresholdData=sizes;
+      for (var ios=0; ios<sizes.ioss.length; ios++){
+        for (var card=0; card<sizes.ioss[ios].cards.length; card++){
+          for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; 
+          channel++){
+            var channelid = "_ios"+ios+"card"+card+"channel"+channel;
+            if (sizes.ioss[ios].cards[card].channels[channel].lolo!=null){
+              filledThresholdData.ioss[ios].cards[card].channels[channel].lolo=
+              parseFloat($("#lolo"+channelid).val());
+              filledThresholdData.ioss[ios].cards[card].channels[channel].lo=
+              parseFloat($("#lo"+channelid).val());
+              filledThresholdData.ioss[ios].cards[card].channels[channel].hi=
+              parseFloat($("#hi"+channelid).val());
+              filledThresholdData.ioss[ios].cards[card].channels[channel].hihi=
+              parseFloat($("#hihi"+channelid).val());
+            }
+            if (sizes.ioss[ios].cards[card].channels[channel].isEnabled!=null){
+              if ($("#isEnabled"+channelid).prop("checked")){
+                filledThresholdData.ioss[ios].cards[card].channels[channel].isEnabled=1;
+              } else {
+                filledThresholdData.ioss[ios].cards[card].channels[channel].isEnabled=0;
+              }
             }
           }
         }
       }
-    }
-    for (var channel=0; channel<sizes.deltav.length; channel++){
-//      var channelid = "_deltav"+sizes.deltav[channel].type+sizes.deltav[channel].id;
-//      channelid = channelid.replace(/\s/g, "_");
-      var channelid = "_deltav"+channel;
-      if (sizes.deltav[channel].multiplier!=null){
-        filledThresholdData.deltav[channel].lolo=parseFloat($("#lolo"+channelid).val());
-        filledThresholdData.deltav[channel].lo=parseFloat($("#lo"+channelid).val());
-        filledThresholdData.deltav[channel].hi=parseFloat($("#hi"+channelid).val());
-        filledThresholdData.deltav[channel].hihi=parseFloat($("#hihi"+channelid).val());
-      }
-      if (sizes.deltav[channel].isEnabled!=null){
-        if ($("#isEnabled"+channelid).prop("checked")){
-          filledThresholdData.deltav[channel].isEnabled=1;
-        } else {
-          filledThresholdData.deltav[channel].isEnabled=0;
+      for (var channel=0; channel<sizes.deltav.length; channel++){
+  //      var channelid = "_deltav"+sizes.deltav[channel].type+sizes.deltav[channel].id;
+  //      channelid = channelid.replace(/\s/g, "_");
+        var channelid = "_deltav"+channel;
+        if (sizes.deltav[channel].multiplier!=null){
+          filledThresholdData.deltav[channel].lolo=parseFloat($("#lolo"+channelid).val());
+          filledThresholdData.deltav[channel].lo=parseFloat($("#lo"+channelid).val());
+          filledThresholdData.deltav[channel].hi=parseFloat($("#hi"+channelid).val());
+          filledThresholdData.deltav[channel].hihi=parseFloat($("#hihi"+channelid).val());
+        }
+        if (sizes.deltav[channel].isEnabled!=null){
+          if ($("#isEnabled"+channelid).prop("checked")){
+            filledThresholdData.deltav[channel].isEnabled=1;
+          } else {
+            filledThresholdData.deltav[channel].isEnabled=0;
+          }
         }
       }
-    }
-      $.get("http://ipinfo.io", function(response) {
-	  filledThresholdData.ip_address = response;
-      }, "jsonp");
-    //filledThresholdData.ip_address = ip_address
-    filledThresholdData.timestamp = presentData.ioss[0].timestamp
-    filledThresholdData.sudbury_time = presentData.ioss[0].sudbury_time
-    filledThresholdData.submitter = $("#name-text").val()
-    filledThresholdData.reason = $("#reason-text").val()
-    filledThresholdData.approved = $("#approved").prop("checked");    
-    $("#statustext").text("Saving..");
-    $.getJSON(path+"/_uuids?count=1", function(result){
-      $("#statustext").text("Saving...");
-      filledThresholdData._id=result.uuids[0]; 
-      delete filledThresholdData._rev;
-      app.db.saveDoc(filledThresholdData, {
-        success : function(resp) {
-          $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val()+" for reason: "+$("#reason-text").val());
-          //formatAll(alarms);    //originally like this; but formatAll
-                                  //doesn't take an argument...
-          formatAll();
-          alert("Save successful");
-	  $("#popupSave").popup("close");  
-        },
-        error : function(resp, textstatus, message) {
-          $("#statustext").text("Save failed: "+message);
-          alert("Save failed: "+message);
-        }
+        $.get("http://ipinfo.io", function(response) {
+  	  filledThresholdData.ip_address = response;
+        }, "jsonp");
+      //filledThresholdData.ip_address = ip_address
+      filledThresholdData.timestamp = presentData.ioss[0].timestamp
+      filledThresholdData.sudbury_time = presentData.ioss[0].sudbury_time
+      filledThresholdData.submitter = $("#name-text").val()
+      filledThresholdData.reason = $("#reason-text").val()
+      filledThresholdData.approved = $("#approved").prop("checked");    
+      $("#statustext").text("Saving..");
+      $.getJSON(path+"/_uuids?count=1", function(result){
+        $("#statustext").text("Saving...");
+        filledThresholdData._id=result.uuids[0]; 
+        delete filledThresholdData._rev;
+        app.db.saveDoc(filledThresholdData, {
+          success : function(resp) {
+            $("#statustext").text("Saved as "+result.uuids[0]+" by "+$("#name-text").val()+" for reason: "+$("#reason-text").val());
+            //formatAll(alarms);    //originally like this; but formatAll
+                                    //doesn't take an argument...
+            formatAll();
+            alert("Save successful");
+  	  $("#popupSave").popup("close");  
+          },
+          error : function(resp, textstatus, message) {
+            $("#statustext").text("Save failed: "+message);
+            alert("Save failed: "+message);
+          }
+        });
       });
-    });
+    }
   });
 
   $("#everything").keydown(function(){
