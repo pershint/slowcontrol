@@ -649,7 +649,25 @@ $.couch.app(function(app) {
 //    retrievePresentValues();
 //  });
 
+
+  String.prototype.hashCode = function(){
+      var hash = 0;
+      if (this.length == 0) return hash;
+      for (var i = 0; i < this.length; i++) {
+          var character = this.charCodeAt(i);
+          hash = ((hash<<5)-hash)+character;
+          hash = hash & hash;  //Converts to 32bit integer
+      }
+      return hash;
+  }
+
+
   $("#saveThresholds").click(function(){
+    var pwdtry= $("#pwd-text").val()
+    pwdhash=pwdtry.hashCode()
+    //Get hash from couchDB channeldb
+    //$.getJSON(
+
     $("#statustext").text("Saving.");
     $(".present").css({"display":"none"});
     $(".approved").css({"display":"none"});
