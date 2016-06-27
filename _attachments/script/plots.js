@@ -202,9 +202,7 @@ $.couch.app(function(app) {
 		    };
                     try{
 		        for (channel=0; channel<hard[ios][0].value[cardName][property].length; channel++){
-			    arranged[ios].cards[card].channels[channel]={
-			        "data":[]
-		 	    };
+			    arranged[ios].cards[card].channels[channel]={"data":[]};
 		        }
 		        for (var row=0; row<hard[ios].length; row++){
 			    try{
@@ -214,15 +212,13 @@ $.couch.app(function(app) {
 			    }
 			    catch(err){
 			        // Bad row in your data, either from empty card names or bad channel entries.  Skip row and move on
-			        //FIXME Make a better pop-up window here; the window alert freezes everything up.
-                                //window.alert("WARNING: Bad data row reading from CouchDB.  IOS: " + ios + " card: " + cardName + " channel: " + channel + " Database: " + db_list[db]["name"] + " timestamp: " + hard[ios][row].key + "  Skipping row and continuing graphing, but check couchDB for data errors");
-			        row++;
+		            row++;
 			    }
 		        }
 		    }
                     catch(err){
                         channel++;
-                        $("#graphstatus").text("Empty values in " + property + " data acquisition.  Probably will not plot correctly.");
+                        $("#graphstatus").text("Empty values in " + property + " data acquisition.  No data may be present for range graphed.  Check DB.");
                     }
                 }
 	    }
@@ -347,7 +343,7 @@ $.couch.app(function(app) {
   function createMasterD(chartindex) {
       Highcharts.setOptions({
           global: {
-	      useUTC : false //puts timestamp axis in local time
+	      useUTC : true //puts timestamp axis in local time
           }
       });
       $('#master-container'+chartindex).highcharts('StockChart', {	
@@ -476,7 +472,7 @@ $.couch.app(function(app) {
       window.alert("Input day invalid; check date and try again");
     }
     else {
-      $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00 GMT");
+      $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00Z");
       graphdate=$("#graphingdate").text();
       getDataDated();
     }
