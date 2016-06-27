@@ -20,6 +20,25 @@ position:relative;
 height:400px;
 min-width:310px;
 }
+
+/*Need !importants to override default*/
+#plotDate .ui-input-text{
+vertical-align:bottom;
+position:relative;
+width:100px !important;
+height:43px !important;
+display:inline-block;
+}
+
+/*
+.smtextbox input[type="text"]{
+vertical-align:bottom;
+width:100px !important;
+height:20px !important;
+display:inline-block;
+}*/
+
+
 .box{
 /*background-color:green;*/
 border:1px solid #000;
