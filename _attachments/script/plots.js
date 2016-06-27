@@ -5,8 +5,7 @@ $.couch.app(function(app) {
     var eTRDataDated=[];
     var hardToReadData=[];
     var easyToReadData=[];
-    var detailVoltages = [];
-    var channelparameter = [];
+    var sizes={"ioss":[]};
 
     var graphdate = "Right Now";
     var graphdateold = "Right Now";
@@ -17,8 +16,12 @@ $.couch.app(function(app) {
     var fifteenmindb="/slowcontrol-data-15min/_design/slowcontrol-data-15min";  
     var options="?descending=true&limit=1";
     var docNumber = "000"
+    var key="?key=";
+    var skey="?startkey=";
+    var ekey="&endkey=";
+    var opts="&descending=true&limit=1";
     var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
-    var sizes={"ioss":[]};
+
 
     var retrieveSizes = function(callback){
 	$.getJSON(path+channeldb+options,function(result){
@@ -107,12 +110,6 @@ $.couch.app(function(app) {
         var keygrabpos=[];
         var ios5secresults=[];
 	var deltavresult;
-        var key="?key=";
-        var skey="?startkey=";
-        var ekey="&endkey=";
-        var opts="&descending=true&limit=1";
-
-//So, I do in fact need to use the $.when(apply... stuff for the first call in the function as well.  Doing so makes the interpreter wait to run whatever's in the when section until it's given the variables it's promised.  
 
         //For each IOS, find a database entry near the proper timestamp
       	for (var i=0; i<recents.length; i++){
