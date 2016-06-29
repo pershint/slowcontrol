@@ -469,7 +469,7 @@ $.couch.app(function(app) {
       window.alert("Input day invalid; check date and try again");
     }
     else {
-      $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00Z");
+      $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00 UTC");
       graphdate=$("#graphingdate").text();
       getDataDated();
     }
