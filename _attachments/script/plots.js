@@ -100,7 +100,6 @@ $.couch.app(function(app) {
     var getDataDated = function(){
 	$("#graphstatus").text("Loading data from date given, please wait...");
         var graphtimestart = Number(Date.parse(graphdate))/1000;
-        var graphtimeend = graphtimestart + 7200; 
         var views=[];
         var keys=[];
         var ios5seckey = [];
@@ -134,9 +133,19 @@ $.couch.app(function(app) {
 		    //arranges the results by IOS no.
 		    keygrabpos=$.grep(ios5seckeygrab, function(e,f){return e[0].value.ios == i+1;});
                     ios5seckey[i]=keygrabpos[0][0].key;
+                    if(Math.abs(ios5seckey[i] - graphtimestart) > 3600){
+                        $("#graphnotice").text("WARNING: Data from IOS " + (i + 1) + " is further than an hour from your requested time.  Check database for missing data.");
+                    } else {
+                        $("#graphnotice").text("");
+                    }
 		}
 		deltavkey=deltavkeygrab;
-  
+                if(Math.abs(deltavkey - graphtimestart) > 3600){
+                    $("#graphnotice").text("WARNING: Data from PI Database is further than an hour from your requested time.  Check database for missing data.");
+                } else {
+                    $("#graphnotice").text("");
+                }
+ 
             //Use the found timestamps to get DB entries
 	    for (var i=0; i<recents.length; i++){
 	        views.push(
@@ -478,6 +487,7 @@ $.couch.app(function(app) {
   $("#setPlotNow").click(function(){
       $("#graphingdate").text("Right Now");
       graphdate=$("#graphingdate").text();
+      $("#graphnotice").text("");
       $("#graphstatus").text("Ready to make live plots!");
   });
 
