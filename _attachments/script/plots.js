@@ -20,7 +20,6 @@ $.couch.app(function(app) {
     var skey="?startkey=";
     var ekey="&endkey=";
     var opts="&descending=true&limit=1";
-    var opt2="&descending=false&limit=1"; 
     var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
 
 
@@ -115,14 +114,14 @@ $.couch.app(function(app) {
         //For each IOS, find a database entry near the proper timestamp
       	for (var i=0; i<recents.length; i++){
             keys.push(
-                $.getJSON(path+fivesecdb+recents[i]+skey+graphtimestart+ekey+graphtimeend+opt2,function(result){
+                $.getJSON(path+fivesecdb+recents[i]+skey+graphtimestart+opts,function(result){
                     ios5seckeygrab.push(result.rows);
                 })
             );
         }
 
         keys.push(
-            $.getJSON(path+onemindb+"/_view/pi_db"+skey+graphtimestart+ekey+graphtimeend+opt2, function(result){
+            $.getJSON(path+onemindb+"/_view/pi_db"+skey+graphtimestart+opts, function(result){
                 deltavkeygrab = result.rows[0].key;
             })
        );
