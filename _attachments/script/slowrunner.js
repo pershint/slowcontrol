@@ -124,6 +124,9 @@ $.couch.app(function(app) {
       if (newChannelType == "cavity_water_temp"){
         $("#cavity_water_temp1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
       }
+      if (newChannelType == "cavity_water_level"){
+        $("#cavity_water_level1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      }
       deltavChannel++;
     }
 
