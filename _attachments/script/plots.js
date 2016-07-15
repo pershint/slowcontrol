@@ -471,14 +471,20 @@ $.couch.app(function(app) {
   });
 
   $("#setPlotDate").click(function(){
-    if($("#plotYear").val() == "Year" || $("plotMonth").val() == "Month" || $("#plotDay").val() == "" || $("#plotHour").val() == "" || parseInt($("#plotHour").val()) < 1 || parseInt($("#plotHour").val()) > 24 || parseInt($("#plotDay").val()) < 1 || parseInt($("#plotDay").val()) > 31 ){
+    var dayVal = Number($("#plotDay").val());
+    var hourVal = Number($("#plotHour").val());
+    if(dayVal !== parseInt(dayVal,10) || hourVal !== parseInt(hourVal,10)){
+      window.alert("Please use integers for the day and hour entry.  Try again.");
+    }
+    else if($("#plotYear").val() == "Year" || $("plotMonth").val() == "Month" || $("#plotDay").val() == "" || $("#plotHour").val() == "" || parseInt($("#plotHour").val()) < 1 || parseInt($("#plotHour").val()) > 24 || parseInt($("#plotDay").val()) < 1 || parseInt($("#plotDay").val()) > 31 ){
       window.alert("Input date invalid; please choose a valid time to plot from.");
     }
     else if( (($.inArray($("#plotMonth").val(), ["Sep","Apr","Jun","Nov"]) > 0) && parseInt($("#plotDay").val()) > 30) || ($("#plotMonth").val() == "Feb" && parseInt($("#plotDay").val()) > 29)){
       window.alert("Input day invalid; check date and try again");
     }
     else {
-      $("#graphingdate").text($("#plotDay").val() + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + $("#plotHour").val() + ":00:00 UTC");
+      //use integer forms of the day and hour input; date parser won't work otherwise
+      $("#graphingdate").text(dayVal + " " + $("#plotMonth").val() + " " + $("#plotYear").val() + " " + hourVal + ":00:00 UTC");
       graphdate=$("#graphingdate").text();
       getDataDated();
     }
