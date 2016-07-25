@@ -443,6 +443,10 @@ $.couch.app(function(app) {
               $("#timing").css({"background-color":"cyan"});
               $("#rackTimingchannel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"cyan"});
             }
+            if (sizes.ioss[ios].cards[card].channels[channel].type=="MTCD"){
+              $("#otherMTCD").css({"background-color":"cyan"});
+              $("#rackTimingchannel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"cyan"});
+            }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="crate"){
               $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id)
               .css({"background-color":"cyan"});
