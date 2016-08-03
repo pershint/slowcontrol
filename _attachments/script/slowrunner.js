@@ -254,7 +254,7 @@ $.couch.app(function(app) {
               $("#xl3s").css({"background-color":"goldenrod"});
               $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channelXL3_"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
-           if (sizes.ioss[ios].cards[card].channels[channel].type=="rack"){
+            if (sizes.ioss[ios].cards[card].channels[channel].type=="rack"){
               $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id)
               .css({"background-color":"goldenrod"});
               $("#rack"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"goldenrod"});
@@ -268,12 +268,12 @@ $.couch.app(function(app) {
               .css({"background-color":"goldenrod"});
               $("#crate"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal).css({"background-color":"goldenrod"});
             }
-           if (sizes.ioss[ios].cards[card].channels[channel].type=="Comp Coil"){
+            if (sizes.ioss[ios].cards[card].channels[channel].type=="Comp Coil"){
               $("#coils").css({"background-color":"goldenrod"});
               $("#coil"+sizes.ioss[ios].cards[card].channels[channel].id+"channel"+sizes.ioss[ios].cards[card].channels[channel].signal.charAt(0)).css({"background-color":"goldenrod"});
             }
             if (sizes.ioss[ios].cards[card].channels[channel].type=="HV Panic" || sizes.ioss[ios].cards[card].channels[channel].type=="UPS"){
-              $("#EStopUPS").css({"background-color":"golenrod"});
+              $("#EStopUPS").css({"background-color":"goldenrod"});
             }
           }
         }
