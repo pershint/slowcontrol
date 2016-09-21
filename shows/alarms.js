@@ -83,12 +83,12 @@ function(doc, req) {
     },
     "AVneck":{
       "channels":[""],
+      "names":["dx,dy,dz,rotx,roty,rotz"],
       "ids":[1,2,3,4,5,6],
       "styles":["one","one","one","one"]
     },
     "equator":{
       "channels":[""],
-      "names":["dz,dy,dx,rotx,roty,rotz"],
       "ids":[1,2,3,4],
       "styles":["one","one","one","one"]
     },
