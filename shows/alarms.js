@@ -12,6 +12,7 @@ function(doc, req) {
     "other":[],
     "equator":[],
     "AVtemp":[],
+    "AVneck":[],
     "cavitywaterlevel":[],
     "conns":[]
   };
@@ -80,8 +81,14 @@ function(doc, req) {
       "ids":[1],
       "styles":["one"]
     },
+    "AVneck":{
+      "channels":[""],
+      "ids":[1,2,3,4,5,6],
+      "styles":["one","one","one","one"]
+    },
     "equator":{
       "channels":[""],
+      "names":["dz,dy,dx,rotx,roty,rotz"],
       "ids":[1,2,3,4],
       "styles":["one","one","one","one"]
     },
@@ -143,7 +150,15 @@ function(doc, req) {
     };
   }
 
-  for (var index=0; index<channels.equator.ids.length; index++){
+  for (var index=0; index<channels.AVneck.ids.length; index++){
+    data.equator[index]={
+      "id":channels.AVneck.ids[index],
+      "name":channels.AVneck.names[index],
+      "style":channels.AVneck.styles[index],
+    };
+  }
+
+ for (var index=0; index<channels.equator.ids.length; index++){
     data.equator[index]={
       "id":channels.equator.ids[index],
       "style":channels.equator.styles[index],
