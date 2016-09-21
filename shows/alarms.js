@@ -83,9 +83,9 @@ function(doc, req) {
     },
     "AVneck":{
       "channels":[""],
-      "names":["dx,dy,dz,rotx,roty,rotz"],
+      "names":["dx","dy","dz","rotx","roty","rotz"],
       "ids":[1,2,3,4,5,6],
-      "styles":["one","one","one","one"]
+      "styles":["one","one","one","one","one","one"]
     },
     "equator":{
       "channels":[""],
@@ -151,7 +151,7 @@ function(doc, req) {
   }
 
   for (var index=0; index<channels.AVneck.ids.length; index++){
-    data.equator[index]={
+    data.AVneck[index]={
       "id":channels.AVneck.ids[index],
       "name":channels.AVneck.names[index],
       "style":channels.AVneck.styles[index],
