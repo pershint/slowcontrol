@@ -420,13 +420,13 @@ $.couch.app(function(app) {
 
     //Finally, if any timestamps on ioses or deltaV are too old, turn enabled boxes cyan
     //Number(($"#time_data_ios").text()) are 0 when $"#time_data_ios" has no value
-    if (Number($("#time_data_ios2").text()) > 35){
+    if (Number($("#time_data_ios2").text()) > 45){
         $("#DetectorServer").css({"background-color":"cyan"});
         $("#IBoot3").css({"background-color":"cyan"});
     }
 
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
-      if (Number($("#time_data_ios"+(ios+1)).text()) > 35){
+      if (Number($("#time_data_ios"+(ios+1)).text()) > 45){
         for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
             $("#present_ios"+ios+"card"+card+"channel"+channel).css({"color":"cyan"});
@@ -465,7 +465,7 @@ $.couch.app(function(app) {
     }
 
     for (var channel=0; channel<sizes.deltav.length; channel++){
-      if(Number($("#time_data_deltav").text()) > 450){
+      if(Number($("#time_data_deltav").text()) > 480){
         $("#present_deltav"+channel).css({"color":"cyan"});
         $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"cyan"});
       }
