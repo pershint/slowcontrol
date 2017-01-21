@@ -465,7 +465,7 @@ $.couch.app(function(app) {
     }
 
     for (var channel=0; channel<sizes.deltav.length; channel++){
-      if(Number($("#time_data_deltav").text()) > 480){
+      if(Number($("#time_data_deltav").text()) > 620){
         $("#present_deltav"+channel).css({"color":"cyan"});
         $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"cyan"});
       }
