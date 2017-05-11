@@ -114,6 +114,7 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
+    var displayvars = ["cavity_water_temp","cavity_water_level","deck_temp", "deck_humidity"];
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
@@ -121,13 +122,10 @@ $.couch.app(function(app) {
         deltavChannel=0;
       }
       $("#present_deltav"+channel).text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
-      if (newChannelType == "cavity_water_temp"){
-        $("#cavity_water_temp1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      if (displayvars.includes(newChannelType)){
+        $("#"+newChannelType+"1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
       }
-      if (newChannelType == "cavity_water_level"){
-        $("#cavity_water_level1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
-      }
-      deltavChannel++;
+    deltavChannel++;
     }
 
     var cardCount;
