@@ -11,7 +11,8 @@ $.couch.app(function(app) {
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
-  var pidb="/_view/pi_db"
+  var pidb="/_view/pi_db";
+  var timestamp="/_view/by_timestamp";
   var checking = true;
   var approval=false;
   var alarmIndex=0;
@@ -155,6 +156,20 @@ $.couch.app(function(app) {
       }
     deltavChannel++;
     }
+    
+    //Fill values on thresholds page for temperature sensors
+    var sensornum=0;
+    for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+      newChannelType = sizes.temp_sensors[channel].type;
+      if (newChannelType != oldChannelType){
+        sensornum=0;
+      }
+      $("#present_temp_sensors"+channel).text(presentValues.temp_sensors[newChannelType]["values"][sizes.temp_sensors[channel].id]);
+      if (displayvars.includes(newChannelType)){
+        $("#"+newChannelType+"1val").text(presentValues.temp_sensors[newChannelType]["values"][sizes.temp_sensors[channel].id]);
+      }
+    sensornum++;
+    }
 
     var cardCount;
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
@@ -238,7 +253,7 @@ $.couch.app(function(app) {
     );
     //Grab data from the cavity temperature sensor database
     views.push(
-      $.getJSON(path+ctempdb+options,function(result, txtstatus, jqobj){
+      $.getJSON(path+ctempdb+timestamp+options,function(result, txtstatus, jqobj){
         ctempresult=result.rows[0].value;
       })
     );
