@@ -164,9 +164,9 @@ $.couch.app(function(app) {
       if (newChannelType != oldChannelType){
         sensornum=0;
       }
-      $("#present_temp_sensors"+channel).text(presentValues.temp_sensors[newChannelType]["values"][sizes.temp_sensors[channel].id]);
+      $("#present_temp_sensors"+channel).text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
       if (displayvars.includes(newChannelType)){
-        $("#"+newChannelType+"1val").text(presentValues.temp_sensors[newChannelType]["values"][sizes.temp_sensors[channel].id]);
+        $("#"+newChannelType+"1val").text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
       }
     sensornum++;
     }
@@ -265,7 +265,7 @@ $.couch.app(function(app) {
       presentData={
         "ioss":[],
         "deltav":deltavresult,
-        "ctemp":ctempresult,
+        "temp_sensors":ctempresult,
         "couchDBtime":responsetime
       };
       for (var i=0; i<iosresults.length; i++){
