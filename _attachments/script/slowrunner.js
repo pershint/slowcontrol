@@ -231,7 +231,7 @@ $.couch.app(function(app) {
     }
     //Grab the data as well as the response header date from CouchDB
     views.push(
-      $.getJSON(path+onemindb+deltav+options,function(result, txtstatus, jqobj){
+      $.getJSON(path+onemindb+pidb+options,function(result, txtstatus, jqobj){
         deltavresult=result.rows[0].value;
         responsetime = jqobj.getResponseHeader("Date");
       })
