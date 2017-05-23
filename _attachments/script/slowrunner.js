@@ -7,7 +7,7 @@ $.couch.app(function(app) {
   var channeldb="/slowcontrol-channeldb/_design/slowcontrol/_view/recent";
   var datadb="/slowcontrol-data-5sec/_design/slowcontrol-data-5sec";
   var onemindb="/slowcontrol-data-1min/_design/slowcontrol-data-1min";
-  var ctempdb="/slowcontrol-data-1min/_design/slowcontrol-cavitytemps";
+  var ctempdb="/slowcontrol-data-cavitytemps/_design/slowcontrol-data-cavitytemps";
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
