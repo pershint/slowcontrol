@@ -7,6 +7,7 @@ $.couch.app(function(app) {
   var channeldb="/slowcontrol-channeldb/_design/slowcontrol/_view/recent";
   var datadb="/slowcontrol-data-5sec/_design/slowcontrol-data-5sec";
   var onemindb="/slowcontrol-data-1min/_design/slowcontrol-data-1min";
+  var ctempdb="/slowcontrol-data-1min/_design/slowcontrol-cavitytemps";
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
@@ -66,6 +67,20 @@ $.couch.app(function(app) {
           $("#isEnabled"+channelid).prop("checked", thresholdData.deltav[channel].isEnabled);
       }
     }
+    for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+      var channelid = "_temp_sensors"+channel;
+      //channelid = channelid.replace("_", "");
+
+      if (thresholdData.temp_sensors[channel].lolo!=null){
+        $("#lolo"+channelid).val(thresholdData.temp_sensors[channel].lolo);
+        $("#lo".channelid).val(thresholdData.temp_sensors[channel].lo);
+        $("#hi"+channelid).val(thresholdData.temp_sensors[channel].hi);
+        $("#hihi"+channelid).val(thresholdData.temp_sensors[channel].hihi);
+      }
+      if (thresholdData.temp_sensors[channel].isEnabled!=null){ //if property exists
+          $("#isEnabled"+channelid).prop("checked", thresholdData.temp_sensors[channel].isEnabled);
+      }
+    }
     if (approved){
       $("#approved").prop("checked",true);
     }
@@ -108,8 +123,18 @@ $.couch.app(function(app) {
         $("#hihi_" + type + channelid).text(thresholdData.deltav[channel].hihi);
       }
     }
+    for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+      var channelid = "_temp_sensors"+channel;
+      //channelid = channelid.replace("_", "");
+      if (thresholdData.temp_sensors){
+        $("#lolo_" + type + channelid).text(thresholdData.temp_sensors[channel].lolo);
+        $("#lo_" + type + channelid).text(thresholdData.temp_sensors[channel].lo);
+        $("#hi_" + type + channelid).text(thresholdData.temp_sensors[channel].hi);
+        $("#hihi_" + type + channelid).text(thresholdData.temp_sensors[channel].hihi);
+      }
+    }
   };
- 
+
   var fillValues = function(presentValues){
     var deltavChannel=0;
     var oldChannelType="";
@@ -188,6 +213,7 @@ $.couch.app(function(app) {
     var views=[];
     var iosresults=[];
     var deltavresult=[];
+    var ctempresult=[];
     var responsetime="";
     for (var i=0; i<recents.length; i++){
       views.push(
@@ -205,6 +231,12 @@ $.couch.app(function(app) {
         responsetime = jqobj.getResponseHeader("Date");
       })
     );
+    //Grab data from the cavity temperature sensor database
+    views.push(
+      $.getJSON(path+ctempdb+options,function(result, txtstatus, jqobj){
+        ctempresult=result.rows[0].value;
+      })
+    );
 
     //pulls all views simultaneously
     $.when.apply($, views)
@@ -213,6 +245,7 @@ $.couch.app(function(app) {
       presentData={
         "ioss":[],
         "deltav":deltavresult,
+        "ctemp":ctempresult,
         "couchDBtime":responsetime
       };
       for (var i=0; i<iosresults.length; i++){
@@ -704,6 +737,26 @@ $.couch.app(function(app) {
           }
         }
       }
+
+      //Fill most recent thresholds values for cavity temperature sensors
+      for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+        var channelid = "_temp_sensors"+channel;
+        if (sizes.temp_sensors[channel].multiplier!=null){
+          filledThresholdData.temp_sensors[channel].lolo=parseFloat($("#lolo"+channelid).val());
+          filledThresholdData.temp_sensors[channel].lo=parseFloat($("#lo"+channelid).val());
+          filledThresholdData.temp_sensors[channel].hi=parseFloat($("#hi"+channelid).val());
+          filledThresholdData.temp_sensors[channel].hihi=parseFloat($("#hihi"+channelid).val());
+        }
+        if (sizes.temp_sensors[channel].isEnabled!=null){
+          if ($("#isEnabled"+channelid).prop("checked")){
+            filledThresholdData.temp_sensors[channel].isEnabled=1;
+          } else {
+            filledThresholdData.temp_sensors[channel].isEnabled=0;
+          }
+        }
+      }
+
+      //Fill most recent threshold values for deltav values
       for (var channel=0; channel<sizes.deltav.length; channel++){
   //      var channelid = "_deltav"+sizes.deltav[channel].type+sizes.deltav[channel].id;
   //      channelid = channelid.replace(/\s/g, "_");

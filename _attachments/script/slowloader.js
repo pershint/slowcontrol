@@ -64,9 +64,19 @@ $.couch.app(function(app) {
         }
       }
     }
+    //Add deltav items in channeldb to your everything to be shown list
     for (var channel = 0; channel<sizes.deltav.length; channel++){
 	channelid = "_deltav"+channel;
 	type = sizes.deltav[channel].type;
+	condensedType = type.replace(/\s+/g, '');
+	$("#everything").append("<div class='channel notAlarmed notUnused type"+ type +"' id='all"+ channelid + "'>");
+	$("#all"+channelid).append(thresholdString(channelid, condensedType));
+    }
+
+    //Add cavity temperatures to your everything list
+    for (var channel = 0; channel<sizes.temp_sensors.length; channel++){
+	channelid = "_temp_sensors"+channel;
+	type = sizes.temp_sensors[channel].type;
 	condensedType = type.replace(/\s+/g, '');
 	$("#everything").append("<div class='channel notAlarmed notUnused type"+ type +"' id='all"+ channelid + "'>");
 	$("#all"+channelid).append(thresholdString(channelid, condensedType));
@@ -209,6 +219,22 @@ $.couch.app(function(app) {
       $("#hihi" + channelid).val(sizes.deltav[channel].hihi);
       if (sizes.deltav[channel].isEnabled!=null){ //if property exists
         $("#isEnabled" + channelid).prop("checked", sizes.deltav[channel].isEnabled);
+      }
+      else {
+        $("#isEnabled" + channelid).attr("disabled", true);
+      }
+    }
+    //Add temperature sensors to our thresholds tab for filling with data
+    for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+      channelid = "_temp_sensors"+channel;
+      channelid = channelid.replace(/\s/g, "_");
+      $("#name"+channelid).text("" +sizes.temp_sensors[channel].type + " " + sizes.temp_sensors[channel].id + " " + sizes.temp_sensors[channel].signal + " (" +sizes.temp_sensors[channel].unit+ ")");
+      $("#lolo" + channelid).val(sizes.temp_sensors[channel].lolo);
+      $("#lo" + channelid).val(sizes.temp_sensors[channel].lo);
+      $("#hi" + channelid).val(sizes.temp_sensors[channel].hi);
+      $("#hihi" + channelid).val(sizes.temp_sensors[channel].hihi);
+      if (sizes.temp_sensors[channel].isEnabled!=null){ //if property exists
+        $("#isEnabled" + channelid).prop("checked", sizes.temp_sensors[channel].isEnabled);
       }
       else {
         $("#isEnabled" + channelid).attr("disabled", true);
