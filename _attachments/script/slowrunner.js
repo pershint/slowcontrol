@@ -11,7 +11,7 @@ $.couch.app(function(app) {
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
-  var deltav="/_view/pi_db"
+  var pidb="/_view/pi_db"
   var checking = true;
   var approval=false;
   var alarmIndex=0;
@@ -22,6 +22,8 @@ $.couch.app(function(app) {
   var sizes={};
   var counter1=true;
   var counter2=true;
+  var iosoldtime = 45;
+  var deltavoldtime = 660;
 
   var retrieveSizes = function(callback){
     $.getJSON(path+channeldb+options,function(result){
@@ -135,6 +137,7 @@ $.couch.app(function(app) {
     }
   };
 
+  //Function fills values on the "overview" page.
   var fillValues = function(presentValues){
     var deltavChannel=0;
     var oldChannelType="";
@@ -180,7 +183,9 @@ $.couch.app(function(app) {
       }
     }
   };
- 
+
+  //Higher level function that runs the "fillThresholds" function and updates
+  //the status on the thresholds page for the user 
   var retrievePresentThresholds = function(fill){
     $("#statustext").text("Getting Thresholds...");
     retrieveSizes(function(){
@@ -257,11 +262,10 @@ $.couch.app(function(app) {
     });
   };
 
-
+  //Sets the colors of values on the thresholds page and also
+  //Sets the colors of the overview page boxes
   var formatAll = function(){
-//    $("#statustext").text("Formatting...");
-
-// Reset everything to okay
+    // Reset everything to okay
     if (colorblindModeOn==false){
       $(".racks").css({"background-color":"forestgreen"});
       $(".crates").css({"background-color":"forestgreen"});
@@ -310,15 +314,21 @@ $.couch.app(function(app) {
         }
       }
     }
+
     for (var channel=0; channel<sizes.deltav.length; channel++){
       if (sizes.deltav[channel].isEnabled==0){
         $("#present_deltav"+channel).css({"color":"goldenrod"});
         $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"goldenrod"});
-//          $("#holdups").css({"background-color":""goldenrod"});
       }
     }
 
-// Set anything with an alarm to red
+    for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+      if (sizes.temp_sensors[channel].isEnabled==0){
+        $("#present_temp_sensors"+channel).css({"color":"goldenrod"});
+      }
+    }
+
+    // Set anything with an alarm to red
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
@@ -355,6 +365,8 @@ $.couch.app(function(app) {
         }
       }
     }
+    //FIXME: Add alarming for cavity temperature sensors here
+
     $("#alarmlist").empty();
       //First, check the detector server connection
       if (alarms.detserver[0].connStatus == "NONE") {
@@ -451,13 +463,13 @@ $.couch.app(function(app) {
 
     //Finally, if any timestamps on ioses or deltaV are too old, turn enabled boxes cyan
     //Number(($"#time_data_ios").text()) are 0 when $"#time_data_ios" has no value
-    if (Number($("#time_data_ios2").text()) > 45){
+    if (Number($("#time_data_ios2").text()) > iosoldtime){
         $("#DetectorServer").css({"background-color":"cyan"});
         $("#IBoot3").css({"background-color":"cyan"});
     }
 
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
-      if (Number($("#time_data_ios"+(ios+1)).text()) > 45){
+      if (Number($("#time_data_ios"+(ios+1)).text()) > iosoldtime){
         for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
             $("#present_ios"+ios+"card"+card+"channel"+channel).css({"color":"cyan"});
@@ -496,7 +508,7 @@ $.couch.app(function(app) {
     }
 
     for (var channel=0; channel<sizes.deltav.length; channel++){
-      if(Number($("#time_data_deltav").text()) > 620){
+      if(Number($("#time_data_deltav").text()) > deltavoldtime){
         $("#present_deltav"+channel).css({"color":"cyan"});
         $("#"+sizes.deltav[channel].type+sizes.deltav[channel].id).css({"background-color":"cyan"});
       }
@@ -504,6 +516,8 @@ $.couch.app(function(app) {
 
   }
 
+  //function not in use.  Should be used if we turn on
+  //automatic rack shut-down.
   var EmergencyRackShutdownCheck=function(){
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
@@ -558,7 +572,7 @@ $.couch.app(function(app) {
       )
     }
     views.push(
-      $.getJSON(path+alarmdb+"/_view/pi_db"+options,function(result){
+      $.getJSON(path+alarmdb+pidb+options,function(result){
         deltavresult=result.rows[0].value;
       })
     );
