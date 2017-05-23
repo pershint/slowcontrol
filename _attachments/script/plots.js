@@ -13,6 +13,8 @@ $.couch.app(function(app) {
     var channeldb="/slowcontrol-channeldb/_design/slowcontrol/_view/recent";
     var fivesecdb="/slowcontrol-data-5sec/_design/slowcontrol-data-5sec";
     var onemindb="/slowcontrol-data-1min/_design/slowcontrol-data-1min";
+    var ctempdb="/slowcontrol-data-cavitytemps/_design/slowcontrol-data-cavitytemps";
+    var ctview="/_view/by_timestamp";
     var fifteenmindb="/slowcontrol-data-15min/_design/slowcontrol-data-15min";  
     var options="?descending=true&limit=1";
     var docNumber = "000"
@@ -41,6 +43,7 @@ $.couch.app(function(app) {
 	var ios1minresults=[];
 	var ios15minresults=[];
 	var deltavresult;
+    var ctempresult;
 	for (var i=0; i<recents.length; i++){
 	    views.push(
 		$.getJSON(path+fivesecdb+recents[i]+options+docNumber,function(result){
@@ -66,12 +69,18 @@ $.couch.app(function(app) {
 		deltavresult=result.rows;
 	    })
 	);
+	views.push(
+	    $.getJSON(path+ctempdb+ctview+options+docNumber,function(result){
+		ctempresult=result.rows;
+	    })
+	);
 	//pulls all views simultaneously
 	hardToReadData={
 	    "ioss":[],
 	    "iosOnemin":[],
 	    "iosFifteenmin":[],
-	    "deltav":[]
+	    "deltav":[],
+        "ctemp":[]
 	};
 	$.when.apply($, views)
 	    .then(function(){
@@ -85,7 +94,8 @@ $.couch.app(function(app) {
 		    hardToReadData.iosFifteenmin[i]=resultpos[0];
 		}
 		hardToReadData.deltav=deltavresult;
-		makeDataEasyToRead(hardToReadData, false);
+		hardToReadData.ctemp=ctempresult;
+    	makeDataEasyToRead(hardToReadData, false);
 		$("#graphstatus").text("Ready to make live plots!");
 		$("#addplot").removeAttr("disabled");
 		return true;
@@ -108,7 +118,7 @@ $.couch.app(function(app) {
         var deltavkeygrab;
         var keygrabpos=[];
         var ios5secresults=[];
-	var deltavresult;
+	    var deltavresult;
 
         //For each IOS, find a database entry near the proper timestamp
       	for (var i=0; i<recents.length; i++){
@@ -125,6 +135,11 @@ $.couch.app(function(app) {
             })
        );
 
+        keys.push(
+            $.getJSON(path+ctempdb+ctview+skey+graphtimestart+opts, function(result){
+                ctempkeygrab = result.rows[0].key;
+            })
+       );
         //Now, push all of the key grab results simultaneously.  Now that keys
         //Are grabbed, also pull the 1000 DB entries before that timestamp.
 	$.when.apply($, keys)
@@ -145,7 +160,15 @@ $.couch.app(function(app) {
                 } else {
                     $("#graphnotice").text("");
                 }
+
+        ctempkey=ctempkeygrab;
+                if(Math.abs(ctempkey - graphtimestart) > 3600){
+                    $("#graphnotice").text("WARNING: Data from PI Database is further than an hour from your requested time.  Check database for missing data.");
+                } else {
+                    $("#graphnotice").text("");
+                }
  
+
             //Use the found timestamps to get DB entries
 	    for (var i=0; i<recents.length; i++){
 	        views.push(
@@ -161,11 +184,17 @@ $.couch.app(function(app) {
 	        })
 	    );
 
+        views.push(
+	        $.getJSON(path+ctempdb+ctview+skey+ctempkey+opts+docNumber,function(result){
+		    ctempresult=result.rows;
+	        })
+	    );
 	    //Once all queries are complete, arranges the views and then
             //Uses MakeDataEasytoRead to rearrange DB entries
 	    hTRDataDated={
 	        "ioss":[],
-	        "deltav":[]
+	        "deltav":[],
+            "temp_sensors":[]
 	    };
 	    $.when.apply($, views)
 	        .then(function(){
@@ -175,6 +204,7 @@ $.couch.app(function(app) {
 		        hTRDataDated.ioss[i]=resultpos[0];
 		    }
 		    hTRDataDated.deltav=deltavresult;
+            hTRDataDated.temp_sensors=ctempresult;
 		    makeDataEasyToRead(hTRDataDated, true);
 		    $("#graphstatus").text("Ready to make plots from date!");
 		    $("#addplot").removeAttr("disabled");
@@ -187,7 +217,7 @@ $.couch.app(function(app) {
     //Takes data in the CouchDB format and rearranges in a more
     //Usable format for the javascript code.
     var makeDataEasyToRead = function(hardToReadData, hasDate){
-	var arrangedData={"ioss":[],"iosOnemin":[],"iosFifteenmin":[],"deltav":[]};
+	var arrangedData={"ioss":[],"iosOnemin":[],"iosFifteenmin":[],"deltav":[],"temp_sensors":[]};
 	if(hasDate == false) {
             var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
 	} else {
@@ -228,6 +258,24 @@ $.couch.app(function(app) {
                     }
                 }
 	    }
+	}
+
+	for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+	    arrangedData.temp_sensors[channel]={"data":[]};
+	    temp_sensorsid=sizes.temp_sensors[channel].id;
+            try{
+ 	            if (hardToReadData.temp_sensors[0]){
+		            for (var row=0; row<hardToReadData.temp_sensors.length; row++){
+                        var entry = "Sensor_"+String(temp_sensorsid);
+		                if (hardToReadData.temp_sensors[0].entry!="N/A"){
+	                        arrangedData.temp_sensors[channel].data.push([hardToReadData.temp_sensors[row].key*1000,hardToReadData.temp_sensors[entry]]);
+		                }
+		            } 
+	            }
+            }
+            catch(err){
+                $("#graphstatus").text("Error in pulling data for Cavity Temperature Data.  No data may be present for range.  Check database.");
+            }
 	}
 
 	for (var channel=0; channel<sizes.deltav.length; channel++){
@@ -443,8 +491,9 @@ $.couch.app(function(app) {
               };
               createMasterD(chartindex);
          }
-      } else {
-	  if (graphdate == "Right Now") {
+      //If the dropdown selected is Deltav, make a chart with DeltaV properties
+      } else if (names[selected].deltav!=null) {
+	      if (graphdate == "Right Now") {
               charts[chartindex]={
                   "name": names[selected].name,
                   "type": names[selected].type,
@@ -453,8 +502,8 @@ $.couch.app(function(app) {
                   "signal": names[selected].signal,
                   "channel": names[selected].channel,
                   "data": easyToReadData.deltav[names[selected].channel].data.reverse()
-	      }; 
-	      createMaster(chartindex);
+	          }; 
+	          createMaster(chartindex);
           } else {
               charts[chartindex]={
                   "name": names[selected].name,
@@ -464,8 +513,32 @@ $.couch.app(function(app) {
                   "signal": names[selected].signal,
                   "channel": names[selected].channel,
                   "data": eTRDataDated.deltav[names[selected].channel].data.reverse()
-	      }; 
-	      createMasterD(chartindex);
+	          }; 
+	          createMasterD(chartindex);
+          }
+      } else if (names[selected].temp_sensors!=null) {
+	      if (graphdate == "Right Now") {
+              charts[chartindex]={
+                  "name": names[selected].name,
+                  "type": names[selected].type,
+                  "id": names[selected].id,
+                  "date": graphdate,
+                  "signal": names[selected].signal,
+                  "channel": names[selected].channel,
+                  "data": easyToReadData.temp_sensors[names[selected].channel].data.reverse()
+	          }; 
+	          createMaster(chartindex);
+          } else {
+              charts[chartindex]={
+                  "name": names[selected].name,
+                  "type": names[selected].type,
+                  "id": names[selected].id,
+                  "date": graphdate,
+                  "signal": names[selected].signal,
+                  "channel": names[selected].channel,
+                  "data": eTRDataDated.temp_sensors[names[selected].channel].data.reverse()
+	          }; 
+	          createMasterD(chartindex);
           }
       }
   });
@@ -499,7 +572,9 @@ $.couch.app(function(app) {
 
   retrieveSizes(function(){
     $("#addplot").attr("disabled","disabled");
-//  Clear voltages and make names in the callback 
+
+    //  Clear voltages and make names in the callback
+    //  The names dictionary is pivotal to making charts!
     var nameindex=0;
     for (var ios = 0; ios<sizes.ioss.length-1; ios++){
       for (var card = 0; card<sizes.ioss[ios].cards.length; card++){
@@ -527,12 +602,24 @@ $.couch.app(function(app) {
         }
       }
     }
+
     for (var channel = 0; channel<sizes.deltav.length; channel++){
       names[nameindex] = {
         "name": ""+sizes.deltav[channel].type+" "+sizes.deltav[channel].id+" "+sizes.deltav[channel].signal+ " ("+sizes.deltav[channel].unit+")",
         "type": sizes.deltav[channel].type,
         "id": sizes.deltav[channel].id,
         "signal": sizes.deltav[channel].signal, 
+        "channel": channel
+      };
+      nameindex++;
+    }
+
+    for (var channel = 0; channel<sizes.temp_sensors.length; channel++){
+      names[nameindex] = {
+        "name": ""+sizes.temp_sensors[channel].type+" "+sizes.temp_sensors[channel].id+" "+sizes.temp_sensors[channel].signal+ " ("+sizes.temp_sensors[channel].unit+")",
+        "type": sizes.temp_sensors[channel].type,
+        "id": sizes.temp_sensors[channel].id,
+        "signal": sizes.temp_sensors[channel].signal, 
         "channel": channel
       };
       nameindex++;
