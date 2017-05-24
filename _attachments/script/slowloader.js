@@ -113,6 +113,8 @@ $.couch.app(function(app) {
     $("#OLDSamp").css({"background-color":"cyan"});
   };
 
+  //fills the drop down list used in the plots tab, then
+  //fills in the names of objects in the thresholds tab page
   var fillNames = function(){
     var nameindex=0;
     for (var ios = 0; ios<sizes.ioss.length-1; ios++){
@@ -145,16 +147,33 @@ $.couch.app(function(app) {
         }
       }
     }
+
+    //Add deltav values to plots tab dropdown list
     for (var channel = 0; channel<sizes.deltav.length; channel++){
       names[nameindex] = {
         "name": ""+sizes.deltav[channel].type+" "+sizes.deltav[channel].id+" "+sizes.deltav[channel].signal+ " ("+sizes.deltav[channel].unit+")",
+        "deltav": true,
         "type": sizes.deltav[channel].type,
         "id": sizes.deltav[channel].id
       };
       $("#name_dropdown").append("<option data-role='none' value="+nameindex +">" + names[nameindex].name + "<\/option>");
       nameindex++;
     }
-    for (var ios=0; ios<sizes.ioss.length-1; ios++){
+
+    //Add cavity temperature sensors to plots.js dropdown list
+    for (var channel = 0; channel<sizes.temp_sensors.length; channel++){
+      names[nameindex] = {
+        "name": ""+sizes.temp_sensors[channel].type+" "+sizes.temp_sensors[channel].id+" "+sizes.temp_sensors[channel].signal+ " ("+sizes.temp_sensors[channel].unit+")",
+        "temp_sensors": true,
+        "type": sizes.temp_sensors[channel].type,
+        "id": sizes.temp_sensors[channel].id
+      };
+      $("#name_dropdown").append("<option data-role='none' value="+nameindex +">" + names[nameindex].name + "<\/option>");
+      nameindex++;
+    }
+
+   //define ios object names used in thresholds tab page
+   for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<sizes.ioss[ios].cards[card].channels.length; channel++){
           var nametext="";

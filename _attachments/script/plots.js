@@ -80,7 +80,7 @@ $.couch.app(function(app) {
 	    "iosOnemin":[],
 	    "iosFifteenmin":[],
 	    "deltav":[],
-        "ctemp":[]
+        "temp_sensors":[]
 	};
 	$.when.apply($, views)
 	    .then(function(){
@@ -94,7 +94,7 @@ $.couch.app(function(app) {
 		    hardToReadData.iosFifteenmin[i]=resultpos[0];
 		}
 		hardToReadData.deltav=deltavresult;
-		hardToReadData.ctemp=ctempresult;
+		hardToReadData.temp_sensors=ctempresult;
     	makeDataEasyToRead(hardToReadData, false);
 		$("#graphstatus").text("Ready to make live plots!");
 		$("#addplot").removeAttr("disabled");
@@ -102,9 +102,6 @@ $.couch.app(function(app) {
 	    });
     };
 
-    //FIXME: Here's where the current bug is.  Doesn't seem to like the startkey, endkey, etc.
-    //but using starttimestamp and endtimestamp gets data, just the wrong thing.  Not sure what
-    //the issue is yet.
     //Function: Grabs 1000 documents from before the input
     //timestamp.  
     var getDataDated = function(){
@@ -219,16 +216,16 @@ $.couch.app(function(app) {
     var makeDataEasyToRead = function(hardToReadData, hasDate){
 	var arrangedData={"ioss":[],"iosOnemin":[],"iosFifteenmin":[],"deltav":[],"temp_sensors":[]};
 	if(hasDate == false) {
-            var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
+        var db_list=[{"name":"ioss","property":"voltages"},{"name":"iosOnemin","property":"average"},{"name":"iosFifteenmin","property":"average"}];
 	} else {
-            var db_list=[{"name":"ioss","property":"voltages"}];
-        }
-        var cardName="";
+        var db_list=[{"name":"ioss","property":"voltages"}];
+    }
+    var cardName="";
 	for (var db=0; db<db_list.length; db++){
 	    for (var ios=0; ios<sizes.ioss.length-1; ios++){
 		var arranged = arrangedData[db_list[db]["name"]];
 		var hard = hardToReadData[db_list[db]["name"]];
-		var property = db_list[db]["property"]
+		var property = db_list[db]["property"];
 		arranged[ios]={"cards":[],"ios":sizes.ioss[ios].ios};
 		for (var card=0; card<sizes.ioss[ios].cards.length; card++){
 		    cardName=sizes.ioss[ios].cards[card].card
@@ -268,7 +265,7 @@ $.couch.app(function(app) {
 		            for (var row=0; row<hardToReadData.temp_sensors.length; row++){
                         var entry = "Sensor_"+String(temp_sensorsid);
 		                if (hardToReadData.temp_sensors[0].entry!="N/A"){
-	                        arrangedData.temp_sensors[channel].data.push([hardToReadData.temp_sensors[row].key*1000,hardToReadData.temp_sensors[entry]]);
+	                        arrangedData.temp_sensors[channel].data.push([hardToReadData.temp_sensors[row].key*1000,hardToReadData.temp_sensors[row].value[entry]]);
 		                }
 		            } 
 	            }
@@ -333,7 +330,7 @@ $.couch.app(function(app) {
 				  series.addPoint([timestamp*1000, value], true, true);
 			      });
 			  }, 5000);
-		      } else {
+		      } else if (charts[chartindex].deltav) {
 			  var type = charts[chartindex].type
 			  var channel = charts[chartindex].channel;
 			  var series = this.series[0];
@@ -350,7 +347,25 @@ $.couch.app(function(app) {
 				  };
 			      });
 			  }, 5000);
-                      }
+              } else if (charts[chartindex].temp_sensors) {
+			  var type = charts[chartindex].type
+			  var channel = charts[chartindex].channel;
+			  var series = this.series[0];
+			  var ctempresults=[];
+			  setInterval(function() {
+			      var getting = $.getJSON(path+ctempdb+ctview+options,function(result){
+				  ctempresults = result.rows[0].value;
+			      });
+			      getting.done(function() {
+				  var timestamp = ctempresults.timestamp;
+                  var entry = "Sensor_"+String(channel);
+				  var value = ctempresults[entry];
+				  if (value!=null) {
+				      series.addPoint([timestamp*1000, value], true, true);
+				  };
+			      });
+			  }, 5000);
+              }
 		  }
               }
           },
@@ -497,6 +512,7 @@ $.couch.app(function(app) {
               charts[chartindex]={
                   "name": names[selected].name,
                   "type": names[selected].type,
+                  "deltav": true,
                   "id": names[selected].id,
                   "date": graphdate,
                   "signal": names[selected].signal,
@@ -508,6 +524,7 @@ $.couch.app(function(app) {
               charts[chartindex]={
                   "name": names[selected].name,
                   "type": names[selected].type,
+                  "deltav": true,
                   "id": names[selected].id,
                   "date": graphdate,
                   "signal": names[selected].signal,
@@ -521,6 +538,7 @@ $.couch.app(function(app) {
               charts[chartindex]={
                   "name": names[selected].name,
                   "type": names[selected].type,
+                  "temp_sensors": true,
                   "id": names[selected].id,
                   "date": graphdate,
                   "signal": names[selected].signal,
@@ -532,6 +550,7 @@ $.couch.app(function(app) {
               charts[chartindex]={
                   "name": names[selected].name,
                   "type": names[selected].type,
+                  "temp_sensors": true,
                   "id": names[selected].id,
                   "date": graphdate,
                   "signal": names[selected].signal,
@@ -606,6 +625,7 @@ $.couch.app(function(app) {
     for (var channel = 0; channel<sizes.deltav.length; channel++){
       names[nameindex] = {
         "name": ""+sizes.deltav[channel].type+" "+sizes.deltav[channel].id+" "+sizes.deltav[channel].signal+ " ("+sizes.deltav[channel].unit+")",
+        "deltav": true,
         "type": sizes.deltav[channel].type,
         "id": sizes.deltav[channel].id,
         "signal": sizes.deltav[channel].signal, 
@@ -617,6 +637,7 @@ $.couch.app(function(app) {
     for (var channel = 0; channel<sizes.temp_sensors.length; channel++){
       names[nameindex] = {
         "name": ""+sizes.temp_sensors[channel].type+" "+sizes.temp_sensors[channel].id+" "+sizes.temp_sensors[channel].signal+ " ("+sizes.temp_sensors[channel].unit+")",
+        "temp_sensors": true,
         "type": sizes.temp_sensors[channel].type,
         "id": sizes.temp_sensors[channel].id,
         "signal": sizes.temp_sensors[channel].signal, 
