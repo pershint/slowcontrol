@@ -143,7 +143,7 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
-    var displayvars = ["cavity_water_temp","cavity_water_level","deck_temp", "deck_humidity"];
+    var displayvars = ["cavity_water_level","deck_temp", "deck_humidity"];
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
