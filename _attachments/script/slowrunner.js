@@ -285,11 +285,17 @@ $.couch.app(function(app) {
       $(".racks").css({"background-color":"forestgreen"});
       $(".crates").css({"background-color":"forestgreen"});
       $(".box").css({"background-color":"forestgreen"});
+      $(".racks").css({"color":"black"});
+      $(".crates").css({"color":"black"});
+      $(".box").css({"color":"black"});
     }
     else {
       $(".racks").css({"background-color":"blue"});
       $(".crates").css({"background-color":"blue"});
       $(".box").css({"background-color":"blue"});
+      $(".racks").css({"color":"white"});
+      $(".crates").css({"color":"white"});
+      $(".box").css({"color":"white"});
     }
     $(".realvalue").css({"color":"black"});
     $(".notUnused").addClass("notAlarmed");
