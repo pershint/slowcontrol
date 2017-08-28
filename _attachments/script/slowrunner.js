@@ -138,12 +138,14 @@ $.couch.app(function(app) {
     }
   };
 
-  //Function fills values on the "overview" page.
+  //Function fills values on the "overview" and "thresholds" page.
   var fillValues = function(presentValues){
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
     var displayvars = ["cavity_water_level","deck_temp", "deck_humidity"];
+    var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": []}
+    var P15Status;
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
@@ -151,12 +153,41 @@ $.couch.app(function(app) {
         deltavChannel=0;
       }
       $("#present_deltav"+channel).text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      //Update variables associated with displayvars array entries
       if (displayvars.includes(newChannelType)){
         $("#"+newChannelType+"1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      }
+      if ("P15IsRunning" == newChannelType){
+        P15Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+      //Fill Recirculation valve arrays with the valve's statuses
+      for (var key in recircdict){
+        if (key == newChannelType){
+          recircdict[key].append(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+        }
       }
     deltavChannel++;
     }
     
+    //Update Recirculation Statuses on "Overview" page
+    var recirc_msgs = {"Cavity": "NO", "AV": "NO"};
+    if (P15Status == 1){ //only recirculation if P15 is on
+      for (var key in recircdict){
+        var arrayLength = recircdict[key].length;
+        for (var i = 0; i < arrayLength; i++) {
+          //Check if any valve is open
+          if (recircdict[key][i] == 1){
+            if (key == "CavityRecircValveIsOpen"){ //is a cavity valve
+              recircshows["Cavity"] = "YES";
+            }
+            else if (key == "AVRecircValveIsOpen"){ //is an AV valve
+              recircshows["AV"] = "YES";
+            }
+          }
+        }
+      }
+    $("#AVRecircStatusval").text(recirc_msgs["Cavity"]);
+    $("#AVRecircStatusval").text(recirc_msgs["AV"]);
+
     //Fill values on thresholds page for temperature sensors
     var sensornum=0;
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
@@ -171,6 +202,7 @@ $.couch.app(function(app) {
     sensornum++;
     }
 
+    //Fill values on overview and thresholds page for IOS data
     var cardCount;
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       $("#time_data_ios"+(ios+1)).text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.ioss[ios].timestamp);

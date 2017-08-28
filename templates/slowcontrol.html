@@ -99,41 +99,31 @@
       
       <div style="width:100%;height:90px">
         <div>
-          Crate XL3's
-        </div>
-        {{#crates}}
-        <div class="{{style}}">
-          {{id}}
-          {{#channels}}
-          <div id="crate{{id}}channel{{channel}}" class="box inside">
-            {{channel}}
-          </div>
-          {{/channels}}
-        </div>
-        {{/crates}}
-      </div>
-
-      <div style="width:100%;height:90px">
-        <div>
           Others
         </div>
-	<div class="big">
-          <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V: <scan id=MTCDval></scan></div>
-        </div>
-	<div class="big">
-          <div id="EStopUPS" class="box big" style="clear:both">E-Stop/HV Disable or UPS</div>
-        </div>
-	<div class="big">
-          <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level: <span id="cavity_water_level1val"></span> ft.</div>
-        </div>
-	<div class="big">
-        <div id="deck_temp1" class="box big" style="clear:both">Deck Temp: <span id="deck_temp1val"></span> C</div>
-        </div>
-	<div class="big">
-        <div id="deck_humidity1" class="box big" style="clear:both">Deck Humidity: <span id="deck_humidity1val"></span> %</div>
-        </div>
+    	<div class="big">
+              <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V: <scan id=MTCDval></scan></div>
+            </div>
+    	<div class="big">
+              <div id="EStopUPS" class="box big" style="clear:both">E-Stop/HV Disable or UPS</div>
+            </div>
+    	<div class="big">
+              <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level: <span id="cavity_water_level1val"></span> ft.</div>
+            </div>
+    	<div class="big">
+            <div id="deck_temp1" class="box big" style="clear:both">Deck Temp: <span id="deck_temp1val"></span> C</div>
+            </div>
+    	<div class="big">
+            <div id="deck_humidity1" class="box big" style="clear:both">Deck Humidity: <span id="deck_humidity1val"></span> %</div>
+            </div>
+        <div class="big">
+            <div id="AVRecircStatus" class="box big" style="clear:both">AV Recirculating? <span id="AvRecircStatusval"></span></div>
+            </div>
+        <div class="big">
+            <div id="CavityRecircStatus" class="box big" style="clear:both">Cavity Recirculating? <span id="CavityRecircStatusval"></span></div>
+            </div>
       </div>
-      
+
       <div style="width:100%;height:90px">
         <div>
           Comp Coil Status
