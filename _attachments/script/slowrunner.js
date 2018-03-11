@@ -144,7 +144,7 @@ $.couch.app(function(app) {
     var oldChannelType="";
     var newChannelType="";
     var displayvars = ["cavity_water_level","deck_temp", "deck_humidity"];
-    var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": []}
+    var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": []};
     var P15Status;
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
@@ -158,11 +158,12 @@ $.couch.app(function(app) {
         $("#"+newChannelType+"1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
       }
       if ("P15IsRunning" == newChannelType){
-        P15Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+        P15Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1];
+      }
       //Fill Recirculation valve arrays with the valve's statuses
       for (var key in recircdict){
         if (key == newChannelType){
-          recircdict[key].append(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+          recircdict[key].push(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
         }
       }
     deltavChannel++;
@@ -177,15 +178,16 @@ $.couch.app(function(app) {
           //Check if any valve is open
           if (recircdict[key][i] == 1){
             if (key == "CavityRecircValveIsOpen"){ //is a cavity valve
-              recircshows["Cavity"] = "YES";
+              recirc_msgs["Cavity"] = "YES";
             }
             else if (key == "AVRecircValveIsOpen"){ //is an AV valve
-              recircshows["AV"] = "YES";
+              recirc_msgs["AV"] = "YES";
             }
           }
         }
       }
-    $("#AVRecircStatusval").text(recirc_msgs["Cavity"]);
+    }
+    $("#CavityRecircStatusval").text(recirc_msgs["Cavity"]);
     $("#AVRecircStatusval").text(recirc_msgs["AV"]);
 
     //Fill values on thresholds page for temperature sensors
