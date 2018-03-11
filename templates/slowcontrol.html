@@ -126,6 +126,24 @@
 
       <div style="width:100%;height:90px">
         <div>
+          Temperature Sensors
+        </div>
+    	<div class="big">
+              <div id="CavAirT" class="box big" style="clear:both">Cavity Air: <scan id=CAirTval></scan> C </div>
+            </div>
+   	    <div class="big">
+             <div id="CavWatTopT" class="box big" style="clear:both">Cavity H20, 20 cm below top: <scan id=CWatTopTval></scan> C </div>
+            </div>
+    	<div class="big">
+              <div id="CavWatMidT" class="box big" style="clear:both">Cavity H20, 10 m below top: <span id="CWatMidTval"></span> C  </div>
+            </div>
+    	<div class="big">
+              <div id="CavWatBotT" class="box big" style="clear:both">Cavity H20, 30 m below top: <span id="CWatBotTval"></span> C</div>
+            </div>
+      </div>
+
+      <div style="width:100%;height:90px">
+        <div>
           Comp Coil Status
         </div>
         {{#compcoils}}
@@ -385,6 +403,8 @@
 	<legend>Choose a time to plot from (UTC):</legend>
 	<select name="plotYear" id="plotYear" data-inline="true" data-native-menu="false">
 	  <option>Year</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
 	  <option value="2018">2018</option>
       <option value="2017">2017</option>
       <option value="2016">2016</option>

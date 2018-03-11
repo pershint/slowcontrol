@@ -190,8 +190,9 @@ $.couch.app(function(app) {
     $("#CavityRecircStatusval").text(recirc_msgs["Cavity"]);
     $("#AVRecircStatusval").text(recirc_msgs["AV"]);
 
-    //Fill values on thresholds page for temperature sensors
+    var pos_sensornum_dict={'CavAirT': 20, 'CavWatTopT': 7, 'CavWatMidT': 2, 'CavWatBotT': 10}
     var sensornum=0;
+    //Fill values on thresholds page for temperature sensors
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
       newChannelType = sizes.temp_sensors[channel].type;
       if (newChannelType != oldChannelType){
@@ -200,6 +201,12 @@ $.couch.app(function(app) {
       $("#present_temp_sensors"+channel).text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
       if (displayvars.includes(newChannelType)){
         $("#"+newChannelType+"1val").text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
+      }
+      for (var key in pos_sensornum_dict){
+        if (pos_sensornum_dict[key]==sizes.temp_sensors[channel].id){
+          var keytemp = presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id];
+          $("#"+key+"val") = keytemp;
+        }
       }
     sensornum++;
     }
@@ -434,7 +441,6 @@ $.couch.app(function(app) {
 	for (var card=0; card<sizes.ioss[ios].cards.length; card++){
           for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
 	      channelInfo=alarms.ioss[ios].cards[card].channels[channel];
-	  //FIXME Let's do the same thing with the xl3s eventually also as the racks regarding disabled/enabled!
           if (channelInfo.type=="xl3"){
             $("#xl3s").css({"background-color":"red"});
             $("#crate"+channelInfo.id+"channelXL3_"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
