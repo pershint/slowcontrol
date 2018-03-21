@@ -39,7 +39,7 @@
   <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
     <a id="rackaudiobutton" loop="true" class="ui-btn ui-btn-icon-right ui-icon-comment">Rack Audio Alarm On</a>
     <a id="testaudiobutton" class="ui-btn ui-btn-icon-right ui-icon-gear">Test Audio</a>
-    <a id="colorblindbutton" class="ui-btn ui-btn-icon-right ui-icon-eye">Colorblind Mode Off</a>
+    <a id="colorblindbutton" class="ui-btn ui-btn-icon-right ui-icon-eye">Color Blind Mode On</a>
     <audio preload="true" id="testaudio">
     <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.ogg" type="audio/ogg" />
     <source src="/slowcontrol-channeldb/_design/slowcontrol/audio/testaudio.mp3" type="audio/mp3" />
@@ -105,7 +105,7 @@
               <div id="otherMTCD" class="box big" style="clear:both">MTCD -2V: <scan id=MTCDval></scan></div>
             </div>
     	<div class="big">
-              <div id="EStopUPS" class="box big" style="clear:both">E-Stop/HV Disable or UPS</div>
+              <div id="EStop" class="box big" style="clear:both">E-Stop/HV Disable</div>
             </div>
     	<div class="big">
               <div id="cavity_water_level1" class="box big" style="clear:both">Cavity Water Level: <span id="cavity_water_level1val"></span> ft.</div>
@@ -129,16 +129,16 @@
           Temperature Sensors
         </div>
     	<div class="big">
-              <div id="CavAirT" class="box big" style="clear:both">Cavity Air: <scan id=CAirTval></scan> C </div>
+            <div id="CavAirT" class="box big" style="clear:both">Cavity Air: <br \> <scan id=CavAirTval></scan> C </div>
             </div>
    	    <div class="big">
-             <div id="CavWatTopT" class="box big" style="clear:both">Cavity H20, 20 cm below top: <scan id=CWatTopTval></scan> C </div>
+            <div id="CavWatTopT" class="box big" style="clear:both">Cavity H20, 20 cm below top: <br \> <scan id=CavWatTopTval></scan> C </div>
             </div>
     	<div class="big">
-              <div id="CavWatMidT" class="box big" style="clear:both">Cavity H20, 10 m below top: <span id="CWatMidTval"></span> C  </div>
+            <div id="CavWatMidT" class="box big" style="clear:both">Cavity H20, 10 m below top: <br \><span id="CavWatMidTval"></span> C  </div>
             </div>
     	<div class="big">
-              <div id="CavWatBotT" class="box big" style="clear:both">Cavity H20, 30 m below top: <span id="CWatBotTval"></span> C</div>
+            <div id="CavWatBotT" class="box big" style="clear:both">Cavity H20, 30 m below top: <br \><span id="CavWatBotTval"></span> C</div>
             </div>
       </div>
 

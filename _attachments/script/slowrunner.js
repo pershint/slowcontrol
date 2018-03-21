@@ -20,7 +20,7 @@ $.couch.app(function(app) {
   var polling=true;
   var sequence;
   var rackAudioOn=true;
-  var colorblindModeOn=false;
+  var colorblindModeOn=true;
   var sizes={};
   var counter1=true;
   var counter2=true;
@@ -191,24 +191,19 @@ $.couch.app(function(app) {
     $("#CavityRecircStatusval").text(recirc_msgs["Cavity"]);
     $("#AVRecircStatusval").text(recirc_msgs["AV"]);
 
-    var sensornum=0;
     //Fill values on thresholds page for temperature sensors
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
       newChannelType = sizes.temp_sensors[channel].type;
-      if (newChannelType != oldChannelType){
-        sensornum=0;
-      }
       $("#present_temp_sensors"+channel).text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
       if (displayvars.includes(newChannelType)){
         $("#"+newChannelType+"1val").text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
       }
       for (var key in pos_sensornum_dict){
         if (pos_sensornum_dict[key]==sizes.temp_sensors[channel].id){
-          var keytemp = presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id];
-          $("#"+key+"val") = keytemp;
+          var keytemp = presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)];
+          $("#"+key+"val").text(keytemp);
         }
       }
-    sensornum++;
     }
 
     //Fill values on overview and thresholds page for IOS data
@@ -331,12 +326,12 @@ $.couch.app(function(app) {
       $(".box").css({"color":"black"});
     }
     else {
-      $(".racks").css({"background-color":"blue"});
-      $(".crates").css({"background-color":"blue"});
-      $(".box").css({"background-color":"blue"});
-      $(".racks").css({"color":"white"});
-      $(".crates").css({"color":"white"});
-      $(".box").css({"color":"white"});
+      $(".racks").css({"background-color":"Navy"});
+      $(".crates").css({"background-color":"Navy"});
+      $(".box").css({"background-color":"Navy"});
+      $(".racks").css({"color":"Silver"});
+      $(".crates").css({"color":"Silver"});
+      $(".box").css({"color":"Silver"});
     }
     $(".realvalue").css({"color":"black"});
     $(".notUnused").addClass("notAlarmed");
@@ -389,7 +384,7 @@ $.couch.app(function(app) {
         $("#present_temp_sensors"+channel).css({"color":"goldenrod"});
         for (var key in pos_sensornum_dict){ 
           if (sizes.temp_sensors[channel].id == pos_sensornum_dict[key]){
-            $("#"+key).css({"background-color":"red"});
+            $("#"+key).css({"background-color":"goldenrod"});
           }
         }
       }
@@ -500,10 +495,10 @@ $.couch.app(function(app) {
             $("#coil"+channelInfo.id+"channel"+channelInfo.signal.charAt(0)).css({"background-color":"red"});
           }
           if (channelInfo.type=="HV Panic" || channelInfo.type=="UPS"){
-            $("#EStopUPS").css({"background-color":"red"});
+            $("#EStop").css({"background-color":"red"});
           }
           if (channelInfo.type=="UPS"){
-            $("#otherMine").css({"background-color":"red"});
+            $("#UPS").css({"background-color":"red"});
           }
 	  if (channelInfo.type=="MTCD"){
             $("#otherMTCD").css({"background-color":"gray"});
@@ -656,7 +651,7 @@ $.couch.app(function(app) {
       })
     );
     views.push(
-      $.getJSON(path+ct+options,function(result){
+      $.getJSON(path+ctalarmdb+options,function(result){
         ctresult=result.rows[0].value;
       })
     );
@@ -958,7 +953,7 @@ $.couch.app(function(app) {
       $("#colorblindbutton").text("Color Blind Mode Off");
       setAlarms();
     }
-    else {
+    else{
       colorblindModeOn=true;
       $("#colorblindbutton").text("Color Blind Mode On");
       setAlarms();
