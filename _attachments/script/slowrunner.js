@@ -9,6 +9,7 @@ $.couch.app(function(app) {
   var onemindb="/slowcontrol-data-1min/_design/slowcontrol-data-1min";
   var ctempdb="/slowcontrol-data-cavitytemps/_design/slowcontrol-data-cavitytemps";
   var alarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms";
+  var ctalarmdb="/slowcontrol-alarms/_design/slowcontrol-alarms-ct/_view/cavitytemps";
   var options="?descending=true&limit=1";
   var recents=["/_view/recent1","/_view/recent2","/_view/recent3","/_view/recent4"];
   var pidb="/_view/pi_db";
@@ -25,7 +26,7 @@ $.couch.app(function(app) {
   var counter2=true;
   var iosoldtime = 45;
   var deltavoldtime = 660;
-
+  var pos_sensornum_dict={'CavAirT': 20, 'CavWatTopT': 7, 'CavWatMidT': 2, 'CavWatBotT': 10}
   var retrieveSizes = function(callback){
     $.getJSON(path+channeldb+options,function(result){
       sizes=result.rows[0].value;
@@ -190,7 +191,6 @@ $.couch.app(function(app) {
     $("#CavityRecircStatusval").text(recirc_msgs["Cavity"]);
     $("#AVRecircStatusval").text(recirc_msgs["AV"]);
 
-    var pos_sensornum_dict={'CavAirT': 20, 'CavWatTopT': 7, 'CavWatMidT': 2, 'CavWatBotT': 10}
     var sensornum=0;
     //Fill values on thresholds page for temperature sensors
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
@@ -387,6 +387,11 @@ $.couch.app(function(app) {
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
       if (sizes.temp_sensors[channel].isEnabled==0){
         $("#present_temp_sensors"+channel).css({"color":"goldenrod"});
+        for (var key in pos_sensornum_dict){ 
+          if (sizes.temp_sensors[channel].id == pos_sensornum_dict[key]){
+            $("#"+key).css({"background-color":"red"});
+          }
+        }
       }
     }
 
@@ -427,8 +432,20 @@ $.couch.app(function(app) {
         }
       }
     }
-    //FIXME: Add alarming for cavity temperature sensors here
 
+    for (var field in alarms.ctemp["current_alarms"]){
+      for (var channel=0; channel<sizes.temp_sensors.length; channel++){
+        if (alarms.ctemp["current_alarms"][field].id==sizes.temp_sensors[channel].id){
+          $("#present_temp_sensors"+channel).css({"color":"red"});
+          for (var key in pos_sensornum_dict){ 
+            if (sizes.temp_sensors[channel].id == pos_sensornum_dict[key]){
+              $("#"+key).css({"background-color":"red"});
+            }
+          }
+        }
+      }
+    }
+    
     $("#alarmlist").empty();
       //First, check the detector server connection
       if (alarms.detserver[0].connStatus == "NONE") {
@@ -624,6 +641,7 @@ $.couch.app(function(app) {
   var setAlarms=function(){
     var views=[];
     var results=[];
+    var ctresult=[];
     for (var i=0; i<recents.length; i++){
       views.push(
         $.getJSON(path+alarmdb+recents[i]+options,function(result){
@@ -637,6 +655,11 @@ $.couch.app(function(app) {
         deltavresult=result.rows[0].value;
       })
     );
+    views.push(
+      $.getJSON(path+ct+options,function(result){
+        ctresult=result.rows[0].value;
+      })
+    );
     //pulls all views simultaneously
     var hardToReadAlarms=[];
     $.when.apply($, views)
@@ -647,6 +670,7 @@ $.couch.app(function(app) {
         hardToReadAlarms.push(resultpos[0]);
       }
       hardToReadAlarms.deltav=deltavresult;
+      hardToReadAlarms.ctemp=ctresult;
       alarms=arrangeAlarmsLikeChanneldb(hardToReadAlarms);
       formatAll();
       $("#rackaudio").get(0).pause();
@@ -664,6 +688,7 @@ $.couch.app(function(app) {
       "ioss":[],
       "deltav":[],
       "detserver":[],
+      "ctemp":[],
       "iboot3":[]
     };
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
@@ -682,6 +707,7 @@ $.couch.app(function(app) {
       }
     }
     arrangedAlarms.deltav=hardToReadAlarms.deltav;
+    arrangedAlarms.ctemp=hardToReadAlarms.ctemp;
     return arrangedAlarms
   }
 
