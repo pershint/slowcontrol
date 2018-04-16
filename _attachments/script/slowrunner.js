@@ -169,7 +169,8 @@ $.couch.app(function(app) {
     deltavChannel++;
     }
     
-    //Update Recirculation Statuses on "Overview" page
+    //Update Recirculation Statuses on "Overview" page and in
+    //present values
     var recirc_msgs = {"Cavity": "NO", "AV": "NO"};
     if (P15Status == 1){ //only recirculation if P15 is on
       for (var key in recircdict){
@@ -300,7 +301,6 @@ $.couch.app(function(app) {
         "ioss":[],
         "deltav":deltavresult,
         "temp_sensors":ctempresult,
-        "recirculation":recirc_msgs,
         "couchDBtime":responsetime
       };
       for (var i=0; i<iosresults.length; i++){
@@ -385,11 +385,11 @@ $.couch.app(function(app) {
     }
 
     // Set colors on recirculation boxes to gray if off
-    if (sizes.recirculation["Cavity"] == "NO"){
-      $("#CavityRecircStatus").css({"color":"gray"});
+    if ($("#CavityRecircStatusval").text() == "NO"){
+      $("#CavityRecircStatus").css({"background-color":"gray"});
     }
-    if (sizes.recirculation["AV"] == "NO"){
-      $("#AVRecircStatus").css({"color":"gray"});
+    if ($("#AVRecircStatusval").text() == "NO"){
+      $("#AVRecircStatus").css({"background-color":"gray"});
     }
     // Set anything with an alarm to red
     // Check alarms for DeltaV components, change box AND text colors
