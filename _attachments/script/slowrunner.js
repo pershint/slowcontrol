@@ -170,7 +170,8 @@ $.couch.app(function(app) {
     deltavChannel++;
     }
     
-    //Update Recirculation Statuses on "Overview" page
+    //Update Recirculation Statuses on "Overview" page and in
+    //present values
     var recirc_msgs = {"Cavity": "NO", "AV": "NO"};
     if (P15Status == 1){ //only recirculation if P15 is on
       for (var key in recircdict){
@@ -390,7 +391,32 @@ $.couch.app(function(app) {
       }
     }
 
+    // Set colors on recirculation boxes to gray if off
+    if ($("#CavityRecircStatusval").text() == "NO"){
+      $("#CavityRecircStatus").css({"background-color":"gray"});
+    }
+    if ($("#AVRecircStatusval").text() == "NO"){
+      $("#AVRecircStatus").css({"background-color":"gray"});
+    }
     // Set anything with an alarm to red
+    // Check alarms for DeltaV components, change box AND text colors
+    var numDeltavChannels = sizes.deltav.length;
+    var channelid="";
+    for (var field in alarms.deltav){
+      for (var i=0; i<alarms.deltav[field].length; i++){
+        for (var channel=0; channel<numDeltavChannels; channel++){
+          if (sizes.deltav[channel].type==alarms.deltav[field][i].type && sizes.deltav[channel].id==alarms.deltav[field][i].id){
+            $("#present_deltav"+channel).css({"color":"red"});
+	    $("#all_deltav"+channel).removeClass("notAlarmed");
+          }
+          // .replace(/\s/g,"") removes underscores.  So, "AV_temp" -> "AVtemp" etc.
+          channelid=field+alarms.deltav[field][i].id;
+          $("#"+channelid).css({"background-color":"red"});
+        }
+      }
+    }
+
+    //Change
     for (var ios=0; ios<sizes.ioss.length-1; ios++){
       for (var card=0; card<sizes.ioss[ios].cards.length; card++){
         for (var channel=0; channel<alarms.ioss[ios].cards[card].channels.length; channel++){
@@ -441,6 +467,7 @@ $.couch.app(function(app) {
       }
     }
     
+    //Go through alarms and change overview boxes; start with IOSes
     $("#alarmlist").empty();
       //First, check the detector server connection
       if (alarms.detserver[0].connStatus == "NONE") {
