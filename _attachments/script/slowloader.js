@@ -68,7 +68,10 @@ $.couch.app(function(app) {
     for (var channel = 0; channel<sizes.deltav.length; channel++){
 	channelid = "_deltav"+channel;
 	type = sizes.deltav[channel].type;
-	condensedType = type.replace(/\s+/g, '');
+	if (type.includes("UPS")){
+      type = "UPS";
+    }
+    condensedType = type.replace(/\s+/g, '');
 	$("#everything").append("<div class='channel notAlarmed notUnused type"+ type +"' id='all"+ channelid + "'>");
 	$("#all"+channelid).append(thresholdString(channelid, condensedType));
     }

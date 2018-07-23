@@ -141,7 +141,21 @@
             <div id="CavWatBotT" class="box big" style="clear:both">Cavity H20, 30 m below top: <br \><span id="CavWatBotTval"></span> C</div>
             </div>
       </div>
-
+      
+      <div style="width:100%;height:90px">
+        <div>
+          UPS Status 
+        </div>
+    	<div class="big">
+            <div id="UPS_battery_status1" class="box big" style="clear:both">Status of UPS Battery: <br \><span id=UPS_battery_status1val></span></div>
+            </div>
+        <div class="big">
+            <div id="UPS_time_on_battery1" class="box big" style="clear:both">Time on UPS (sec): <scan id=UPS_time_on_battery1val></scan></div>
+            </div>
+   	    <div class="big">
+            <div id="UPS_estimated_time_left1" class="box big" style="clear:both">Approx. UPS time available (min): <scan id=UPS_estimated_time_left1val></scan></div>
+            </div>
+      </div>
       <div style="width:100%;height:90px">
         <div>
           Comp Coil Status
@@ -315,7 +329,8 @@
       <option value="equator_monitor">Equator Monitors</option>
 	  <option value="cover_gas">Cover Gas</option>
       <option value="cavity_sensor">Cavity Temperatures</option>
-	</select>
+      <option value="UPS">UPS Readings</option>
+    </select>
 	<button type="button" id="selectChannels" class="ui-btn	ui-btn-inline">Select</button>
 	<button type="button" id="enableChannels" class="ui-btn ui-mini ui-btn-inline" disabled>Enable All</button>
 	<button type="button" id="disableChannels" class="ui-btn ui-mini ui-btn-inline" disabled>Disable All</button>

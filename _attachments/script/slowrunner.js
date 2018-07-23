@@ -144,7 +144,10 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
-    var displayvars = ["cavity_water_level","deck_temp", "deck_humidity"];
+    var displayvars = ["cavity_water_level","deck_temp", "deck_humidity",
+        "UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
+                   
+    var UPSvars = ["UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
     var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": []};
     var P15Status;
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
@@ -196,9 +199,9 @@ $.couch.app(function(app) {
     for (var channel=0; channel<sizes.temp_sensors.length; channel++){
       newChannelType = sizes.temp_sensors[channel].type;
       $("#present_temp_sensors"+channel).text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
-      if (displayvars.includes(newChannelType)){
-        $("#"+newChannelType+"1val").text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
-      }
+      //if (displayvars.includes(newChannelType)){
+      //  $("#"+newChannelType+"1val").text(presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)]);
+      //}
       for (var key in pos_sensornum_dict){
         if (pos_sensornum_dict[key]==sizes.temp_sensors[channel].id){
           var keytemp = presentValues.temp_sensors["Sensor_"+String(sizes.temp_sensors[channel].id)];
