@@ -144,8 +144,11 @@ $.couch.app(function(app) {
     var deltavChannel=0;
     var oldChannelType="";
     var newChannelType="";
+    var P16CavRecircValves = ["V174","V175","V176","V178-179"];
+    var P15CavRecircValves = ["V174","V175","V176","V178-179","V181"];
     var displayvars = ["cavity_water_level","deck_temp", "deck_humidity",
-        "UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
+        "UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status",
+        "cover_gas"];
                    
     var UPSvars = ["UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
     var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": [],"P16IsRunning": []};
@@ -159,8 +162,13 @@ $.couch.app(function(app) {
       }
       $("#present_deltav"+channel).text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
       //Update variables associated with displayvars array entries
+      //FIXME: This is just bad; let's make this more reasonable...
       if (displayvars.includes(newChannelType)){
+        if (newChannelType == "cover_gas" && sizes.deltav[channel].signal == "differential_pressure"){
+            $("#CoverGasdPval").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+        } else {
         $("#"+newChannelType+"1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+        }
       }
       if ("P15IsRunning" == newChannelType){
         P15Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1];
@@ -171,7 +179,10 @@ $.couch.app(function(app) {
       //Fill Recirculation valve arrays with the valve's statuses
       for (var key in recircdict){
         if (key == newChannelType){
-          recircdict[key].push(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+          var valvedict = {};
+          valvedict["valve_state"] = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1];
+          valvedict["valve_name"] = sizes.deltav[channel].signal;
+          recircdict[key].push(valvedict)
         }
       }
     deltavChannel++;
@@ -180,32 +191,45 @@ $.couch.app(function(app) {
     //Update Recirculation Statuses on "Overview" page and in
     //present values
     var recirc_msgs = {"Cavity": "NO", "AV": "NO"};
-    if (P15Status == 1){ //only AV recirculation if P15 is on
+    if (P15Status == 1){ //Possible AV or Cavity Recirculation
       for (var key in recircdict){
-        var arrayLength = recircdict[key].length;
-        var numValvesOpen = 0;
-        for (var i = 0; i < arrayLength; i++) {
-          //Check if any valve is open
-          if (recircdict[key][i] == 1 && key == "AVRecircValveIsOpen"){ //is an AV Valve
-            numValvesOpen+=1;
+        if (key == "AVRecircValveIsOpen"){
+          var arrayLength = recircdict[key].length;
+          var numValvesOpen = 0;
+          for (var i = 0; i < arrayLength; i++) {
+            //Check if any valve is open
+            if (recircdict[key][i]["valve_state"] == 1){ //An AV Valve is open 
+              numValvesOpen+=1;
+            }
+          }
+          if (numValvesOpen == arrayLength){  //all valves in AV list must be open to be recirculating
+            recirc_msgs["AV"] = "YES";
           }
         }
-        if (numValvesOpen == arrayLength){  //all valves in AV list must be open to be recirculating
-          recirc_msgs["AV"] = "YES";
-        }
-      }
-    }
-    if (P15Status == 1 || P16Status != "STOPPED"){ //Cavity recirc from P15 or P16
-      for (var key in recircdict){
-        var arrayLength = recircdict[key].length;
-        for (var i = 0; i < arrayLength; i++) {
-          //Check if any valve is open
-          if (recircdict[key][i] == 1){
-            if (key == "CavityRecircValveIsOpen"){ //is a cavity valve
+        if (key == "CavityRecircValveIsOpen"){
+          //Check if Cavity recirculation is happening w/ P15
+          arrayLength = recircdict[key].length;
+          for (var i = 0; i < arrayLength; i++) {
+            //Check if any of the necessary valves are open 
+            if (P15CavRecircValves.includes(recircdict[key][i]["valve_name"])){
               recirc_msgs["Cavity"] = "YES";
             }
           }
-        }
+        }  
+      }
+    }
+    if (P16Status != "STOPPED"){ //Cavity recirc from P16
+      for (var key in recircdict){
+        if (key == "CavityRecircValveIsOpen"){
+          //Check if Cavity recirculation is happening w/ P15
+          arrayLength = recircdict[key].length;
+          for (var i = 0; i < arrayLength; i++) {
+            //Check if any of the necessary valves are open 
+            if (P16CavRecircValves.includes(recircdict[key][i]["valve_name"])){
+              recirc_msgs["Cavity"] = "YES";
+            }
+          }
+        }  
       }
     }
     $("#CavityRecircStatusval").text(recirc_msgs["Cavity"]);
