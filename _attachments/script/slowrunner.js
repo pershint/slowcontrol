@@ -148,8 +148,9 @@ $.couch.app(function(app) {
         "UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
                    
     var UPSvars = ["UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
-    var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": []};
+    var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": [],"P16IsRunning": []};
     var P15Status;
+    var P16Status;
     $("#time_data_deltav").text(Date.parse(presentValues.couchDBtime)/1000 - presentValues.deltav.timestamp);
     for (var channel=0; channel<sizes.deltav.length; channel++){
       newChannelType = sizes.deltav[channel].type;
@@ -164,6 +165,9 @@ $.couch.app(function(app) {
       if ("P15IsRunning" == newChannelType){
         P15Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1];
       }
+      if ("P16IsRunning" == newChannelType){
+        P16Status = presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1];
+      }
       //Fill Recirculation valve arrays with the valve's statuses
       for (var key in recircdict){
         if (key == newChannelType){
@@ -176,7 +180,22 @@ $.couch.app(function(app) {
     //Update Recirculation Statuses on "Overview" page and in
     //present values
     var recirc_msgs = {"Cavity": "NO", "AV": "NO"};
-    if (P15Status == 1){ //only recirculation if P15 is on
+    if (P15Status == 1){ //only AV recirculation if P15 is on
+      for (var key in recircdict){
+        var arrayLength = recircdict[key].length;
+        var numValvesOpen = 0;
+        for (var i = 0; i < arrayLength; i++) {
+          //Check if any valve is open
+          if (recircdict[key][i] == 1 && key == "AVRecircValveIsOpen"){ //is an AV Valve
+            numValvesOpen+=1;
+          }
+        }
+        if (numValvesOpen == arrayLength){  //all valves in AV list must be open to be recirculating
+          recirc_msgs["AV"] = "YES";
+        }
+      }
+    }
+    if (P15Status == 1 || P16Status != "STOPPED"){ //Cavity recirc from P15 or P16
       for (var key in recircdict){
         var arrayLength = recircdict[key].length;
         for (var i = 0; i < arrayLength; i++) {
@@ -184,9 +203,6 @@ $.couch.app(function(app) {
           if (recircdict[key][i] == 1){
             if (key == "CavityRecircValveIsOpen"){ //is a cavity valve
               recirc_msgs["Cavity"] = "YES";
-            }
-            else if (key == "AVRecircValveIsOpen"){ //is an AV valve
-              recirc_msgs["AV"] = "YES";
             }
           }
         }
