@@ -391,7 +391,7 @@ $.couch.app(function(app) {
           },
 	  
         title : {
-            text : charts[chartindex].name 
+            text : charts[chartindex].name  + ', your local time'
         },
 
         exporting: {
