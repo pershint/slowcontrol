@@ -210,9 +210,12 @@ $.couch.app(function(app) {
           //Check if Cavity recirculation is happening w/ P15
           arrayLength = recircdict[key].length;
           for (var i = 0; i < arrayLength; i++) {
-            //Check if any of the necessary valves are open 
+            //Check if a valve is associated with P15 circulation 
             if (P15CavRecircValves.includes(recircdict[key][i]["valve_name"])){
-              recirc_msgs["Cavity"] = "YES";
+              //Currently, if any valve is open, Cavity is recirculating
+              if (recircdict[key][i]["valve_state"]==1){
+                recirc_msgs["Cavity"] = "YES";
+              }
             }
           }
         }  
@@ -226,7 +229,10 @@ $.couch.app(function(app) {
           for (var i = 0; i < arrayLength; i++) {
             //Check if any of the necessary valves are open 
             if (P16CavRecircValves.includes(recircdict[key][i]["valve_name"])){
-              recirc_msgs["Cavity"] = "YES";
+              //Currently, if any valve is open, Cavity is recirculating
+              if (recircdict[key][i]["valve_state"]==1){
+                recirc_msgs["Cavity"] = "YES";
+              }
             }
           }
         }  

@@ -261,7 +261,7 @@ $.couch.app(function(app) {
 	    arrangedData.temp_sensors[channel]={"data":[]};
 	    temp_sensorsid=sizes.temp_sensors[channel].id;
             try{
- 	            if (hardToReadData.temp_sensors[0]){
+ 	            if (hardToReadData.temp_sensors[0]!==null){
 		            for (var row=0; row<hardToReadData.temp_sensors.length; row++){
                         var entry = "Sensor_"+String(temp_sensorsid);
 		                if (hardToReadData.temp_sensors[0].entry!="N/A"){
@@ -280,7 +280,7 @@ $.couch.app(function(app) {
 	    cleanedtype=sizes.deltav[channel].type;
 	    deltavid=sizes.deltav[channel].id-1;
             try{
- 	        if (hardToReadData.deltav[0].value[cleanedtype].values[deltavid]){
+ 	        if (hardToReadData.deltav[0].value[cleanedtype].values[deltavid]!==null){
 		    for (var row=0; row<hardToReadData.deltav.length; row++){
 		        if (hardToReadData.deltav[row].value[cleanedtype].values[deltavid]!="N/A"){
 	                    arrangedData.deltav[channel].data.push([hardToReadData.deltav[row].key*1000,hardToReadData.deltav[row].value[cleanedtype].values[deltavid]]);
@@ -303,6 +303,13 @@ $.couch.app(function(app) {
   //This function will also continue to update the chart's series with the most
   //recent database inputs.
   function createMaster(chartindex) {
+  //for (var data_index = 0; data_index<charts[chartindex]["data"].length-1; data_index++){
+  //        if(charts[chartindex]["data"][data_index].y == 0)
+  //        {
+  //            //I regret nothing
+  //            charts[chartindex]["data"][data_index].update(null);
+  //        }
+  //   }
       Highcharts.setOptions({
           global: {
 	      useUTC : false //puts timestamp axis in local time
@@ -333,6 +340,7 @@ $.couch.app(function(app) {
 		      } else if (charts[chartindex].deltav) {
 			  var type = charts[chartindex].type
 			  var channel = charts[chartindex].channel;
+              var id = charts[chartindex].id;
 			  var series = this.series[0];
 			  var deltavresults=[];
 			  setInterval(function() {
@@ -341,10 +349,12 @@ $.couch.app(function(app) {
 			      });
 			      getting.done(function() {
 				  var timestamp = deltavresults.timestamp;
-				  var value = deltavresults[type]["values"][channel];
-				  if (value!=null) {
+				  var value = deltavresults[type]["values"][id];
+				  if (value!==null) {
 				      series.addPoint([timestamp*1000, value], true, true);
-				  };
+				  }; // else {
+				  //    series.addPoint([timestamp*1000, 0], true, true);
+				  //};
 			      });
 			  }, 5000);
               } else if (charts[chartindex].temp_sensors) {
@@ -360,9 +370,11 @@ $.couch.app(function(app) {
 				  var timestamp = ctempresults.timestamp;
                   var entry = "Sensor_"+String(channel);
 				  var value = ctempresults[entry];
-				  if (value!=null) {
+				  if (value!==null) {
 				      series.addPoint([timestamp*1000, value], true, true);
-				  };
+				  }; //else {
+				  //    series.addPoint([timestamp*1000, 0], true, true);
+				  //};
 			      });
 			  }, 5000);
               }
@@ -397,9 +409,12 @@ $.couch.app(function(app) {
         exporting: {
             enabled: true
         },
-
+        yAxis: {
+            minRange: charts[chartindex].minRange
+        }, 
         series : [{
-            name : 'Voltage',
+            name : 'Value',
+            connectNulls: true,
 	    data : charts[chartindex].data
         }]
     });
@@ -454,9 +469,12 @@ $.couch.app(function(app) {
         exporting: {
             enabled: true
         },
-
+        yAxis: {
+            minRange: charts[chartindex].minRange
+        }, 
         series : [{
-            name : 'Voltage',
+            name : 'Value',
+            connectNulls: true,
 	    data : charts[chartindex].data
         }]
     });
@@ -485,6 +503,7 @@ $.couch.app(function(app) {
       if (names[selected].ios!=null) {
           if (graphdate == "Right Now") {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "ios":names[selected].ios,
                   "card":names[selected].card,
                   "channel":names[selected].channel,
@@ -497,6 +516,7 @@ $.couch.app(function(app) {
               createMaster(chartindex);
           } else {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "ios":names[selected].ios,
                   "card":names[selected].card,
                   "channel":names[selected].channel,
@@ -510,6 +530,7 @@ $.couch.app(function(app) {
       } else if (names[selected].deltav!=null) {
 	      if (graphdate == "Right Now") {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "name": names[selected].name,
                   "type": names[selected].type,
                   "deltav": true,
@@ -522,6 +543,7 @@ $.couch.app(function(app) {
 	          createMaster(chartindex);
           } else {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "name": names[selected].name,
                   "type": names[selected].type,
                   "deltav": true,
@@ -536,6 +558,7 @@ $.couch.app(function(app) {
       } else if (names[selected].temp_sensors!=null) {
 	      if (graphdate == "Right Now") {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "name": names[selected].name,
                   "type": names[selected].type,
                   "temp_sensors": true,
@@ -548,6 +571,7 @@ $.couch.app(function(app) {
 	          createMaster(chartindex);
           } else {
               charts[chartindex]={
+                  "minRange": 0.01,
                   "name": names[selected].name,
                   "type": names[selected].type,
                   "temp_sensors": true,
