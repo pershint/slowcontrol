@@ -349,7 +349,7 @@ $.couch.app(function(app) {
 			      });
 			      getting.done(function() {
 				  var timestamp = deltavresults.timestamp;
-				  var value = deltavresults[type]["values"][id];
+				  var value = deltavresults[type]["values"][id-1];
 				  if (value!==null) {
 				      series.addPoint([timestamp*1000, value], true, true);
 				  }; // else {

@@ -165,7 +165,7 @@ $.couch.app(function(app) {
       //FIXME: This is just bad; let's make this more reasonable...
       if (displayvars.includes(newChannelType)){
         if (newChannelType == "cover_gas" && sizes.deltav[channel].signal == "differential_pressure"){
-            $("#CoverGasdPval").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
+            $("#cover_gas5val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
         } else {
         $("#"+newChannelType+"1val").text(presentValues.deltav[newChannelType]["values"][sizes.deltav[channel].id-1]);
         }
