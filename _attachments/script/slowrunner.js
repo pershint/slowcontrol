@@ -148,7 +148,7 @@ $.couch.app(function(app) {
     var P15CavRecircValves = ["V174","V175","V176","V178-179","V181"];
     var displayvars = ["cavity_water_level","deck_temp", "deck_humidity",
         "UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status",
-        "cover_gas"];
+        "cover_gas","AV_scint_height"];
                    
     var UPSvars = ["UPS_time_on_battery","UPS_estimated_time_left","UPS_battery_status"];
     var recircdict = {"CavityRecircValveIsOpen": [],"AVRecircValveIsOpen": [], "P15IsRunning": [],"P16IsRunning": []};
